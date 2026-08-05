@@ -1,0 +1,14 @@
+pnpm-lock.yaml
+node_modules
+.next
+dist
+.turbo
+docs/PRODUCT.md
+AGENTS.md
+test-results/
+playwright-report/
+artifacts/
+**/next-env.d.ts
+# Preserve raw browser-export markup (including intentionally omitted end tags).
+tests/fixtures/bookmarks/*.html
+
