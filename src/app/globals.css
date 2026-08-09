@@ -1,0 +1,117 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+
+@theme inline {
+  --font-sans:
+    'Pretendard', 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic',
+    system-ui, sans-serif;
+  --color-outside: var(--outside);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-surface: var(--surface);
+  /* shadcn card role reuses the existing surface; no second palette. */
+  --color-card: var(--surface);
+  --color-card-foreground: var(--foreground);
+  --color-surface-raised: var(--surface-raised);
+  --color-disabled: var(--disabled);
+  --color-primary: var(--accent);
+  --color-primary-foreground: var(--background);
+  --color-secondary: var(--surface);
+  --color-secondary-foreground: var(--foreground);
+  --color-muted: var(--surface);
+  --color-muted-foreground: var(--text-secondary);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--background);
+  --color-accent-subtle: var(--accent-subtle);
+  --color-accent-hover: var(--accent-hover);
+  --color-tile-medium: var(--tile-medium);
+  --color-destructive: var(--danger);
+  --color-favorite: var(--favorite);
+  --color-border: var(--border);
+  --color-input: var(--border);
+  --color-ring: var(--accent);
+  --radius-sm: 8px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --text-list: 15px;
+  --text-meta: 12px;
+  --text-hero: 28px;
+}
+
+:root {
+  color-scheme: dark;
+  --outside: #0f1012;
+  --background: #151515;
+  --surface: #1f2022;
+  --surface-raised: #2a2d31;
+  --foreground: #f3f1ea;
+  --text-secondary: #9a9ea6;
+  --disabled: #62666d;
+  --accent: #8fa7c8;
+  --accent-subtle: #29313d;
+  --accent-hover: #a0b6d3;
+  --tile-medium: #24272b;
+  --border: #34373c;
+  --danger: #d86a70;
+  --favorite: #d9b76f;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-outside font-sans text-sm text-foreground antialiased;
+  }
+  button,
+  a,
+  input,
+  select,
+  textarea {
+    -webkit-tap-highlight-color: transparent;
+  }
+  button:not(:disabled),
+  select {
+    cursor: pointer;
+  }
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 4px;
+  }
+  ::selection {
+    background: var(--accent-subtle);
+    color: var(--foreground);
+  }
+}
+
+/* Page-owned horizontal spacing, shared by TopBar and screen content. */
+@utility page-gutter {
+  @apply px-5 md:px-6;
+}
+
+@layer components {
+  /* Frame only: callers own content layout/padding; never an external margin. */
+  .surface-card {
+    @apply rounded-lg border bg-card;
+  }
+  .field-control {
+    @apply h-12 w-full min-w-0 rounded-sm border border-input bg-surface px-3.5 text-base text-foreground outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:text-disabled;
+    @apply focus-visible:border-accent focus-visible:outline-1 focus-visible:outline-offset-0 focus-visible:outline-accent aria-invalid:border-destructive;
+  }
+  .screen-content {
+    @apply page-gutter flex min-w-0 flex-col gap-8 pb-8 pt-6;
+  }
+  .bottom-safe {
+    padding-bottom: max(12px, env(safe-area-inset-bottom));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
