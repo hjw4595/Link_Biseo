@@ -1,0 +1,16 @@
+<!DOCTYPE NETSCAPE-Bookmark-file-1>
+<H1>Bookmarks</H1>
+<base href="https://bookmark-attacker.invalid/base/">
+<script>globalThis.bookmarkExecuted = true; fetch('https://bookmark-attacker.invalid/script')</script>
+<img src="https://bookmark-attacker.invalid/image" onerror="globalThis.bookmarkExecuted=true">
+<iframe src="https://bookmark-attacker.invalid/frame" srcdoc="&lt;script&gt;parent.bookmarkExecuted=true&lt;/script&gt;"></iframe>
+<link rel="stylesheet" href="https://bookmark-attacker.invalid/style">
+<style>@import url('https://bookmark-attacker.invalid/import'); body {background:url('https://bookmark-attacker.invalid/css')}</style>
+<svg onload="globalThis.bookmarkExecuted=true"><image href="https://bookmark-attacker.invalid/svg"/></svg>
+<object data="https://bookmark-attacker.invalid/object"></object>
+<video poster="https://bookmark-attacker.invalid/poster"><source src="https://bookmark-attacker.invalid/video"></video>
+<DL><p>
+  <DT><A HREF="https://example.com/safe#section" ICON="https://bookmark-attacker.invalid/icon" onclick="globalThis.bookmarkExecuted=true">&lt;img src=x onerror=alert(1)&gt;</A>
+  <DT><A HREF="javascript:alert(1)">위험한 링크</A>
+  <DT><A HREF="relative">상대 링크</A>
+</DL><p>
