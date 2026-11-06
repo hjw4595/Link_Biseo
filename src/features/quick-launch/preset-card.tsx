@@ -208,7 +208,7 @@ export function PresetCard({
                   <li key={link.id} className="border-b">
                     <ExternalLink
                       link={link}
-                      disabled={!ready}
+                      disabled={!ready || (launch.incognito && launch.locked)}
                       newTab
                       onActivate={() => launch.recordIndividual(link)}
                       label={`${link.title} 개별 열기`}
@@ -258,11 +258,13 @@ export function PresetCard({
                 : '열기 요청을 보내지 못했어요. 링크 URL을 확인해 주세요.'}
             </p>
             <p className="text-meta text-muted-foreground">
-              브라우저 설정에 따라 일부 탭이 열리지 않을 수 있어요. 직접 다시
-              열면 탭이 중복될 수 있어요.
+              {launch.secretResult
+                ? '시크릿 창 생성이 확인됐어요. 페이지 방문 완료를 의미하지는 않아요.'
+                : '브라우저 설정에 따라 일부 탭이 열리지 않을 수 있어요. 직접 다시 열면 탭이 중복될 수 있어요.'}
             </p>
           </div>
         )}
+        {launch.error && <p role="alert">{launch.error}</p>}
         <div className="flex justify-end pt-2">
           <Button
             size="sm"

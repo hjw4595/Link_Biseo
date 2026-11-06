@@ -63,6 +63,7 @@ export default function Home() {
           />
           {links.isPending ? (
             <LinkListSkeleton
+              compact
               count={6}
               grid
               text="즐겨찾기를 불러오고 있어요."

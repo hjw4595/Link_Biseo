@@ -18,6 +18,7 @@ import { PresetEditor } from './preset-editor';
 import { PresetCard } from './preset-card';
 import { useDesktopHome } from './use-desktop-home';
 import { SectionHeader } from '@/components/common/section-header';
+import { ContentSkeleton } from '@/components/common/content-skeleton';
 
 function ExistingEditor({
   id,
@@ -35,7 +36,11 @@ function ExistingEditor({
   if (!snapshot && (detail.isPending || detail.isFetching))
     return (
       <AppSheetContent>
-        <p role="status">빠른 실행을 불러오고 있어요.</p>
+        <ContentSkeleton
+          text="빠른 실행을 불러오고 있어요."
+          variant="form"
+          count={3}
+        />
       </AppSheetContent>
     );
   if (!snapshot)

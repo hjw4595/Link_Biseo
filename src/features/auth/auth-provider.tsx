@@ -13,6 +13,7 @@ import { UserQueryProvider } from '@/lib/query/provider';
 import { AppShell } from '@/components/common/app-shell';
 import { Button } from '@/components/ui/button';
 import { AuthLoading } from './auth-loading';
+import { LaunchProvider } from '@/features/link-launch/provider';
 
 type AuthState =
   | { status: 'initializing' | 'unauthenticated' }
@@ -124,7 +125,9 @@ export function AuthProvider({
   return (
     <AuthContext.Provider value={{ user: state.user, signOut }}>
       <UserQueryProvider key={state.user.id}>
-        <AppShell>{children}</AppShell>
+        <LaunchProvider>
+          <AppShell>{children}</AppShell>
+        </LaunchProvider>
       </UserQueryProvider>
     </AuthContext.Provider>
   );

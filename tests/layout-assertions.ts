@@ -1,14 +1,8 @@
 import { expect, type Page, type Locator } from '@playwright/test';
 
 // Test oracle is deliberately independent of production Tailwind classes.
-export function expectedWidth(path: string, viewport: number) {
-  const workspace =
-    ['/links', '/links/import'].includes(path) || path.startsWith('/category/');
-  const hub = ['/categories', '/settings', '/assistant/organization'].includes(
-    path,
-  );
-  const expanded = workspace || hub || path === '/';
-  const cap = !expanded || viewport < 768 ? 512 : viewport < 1024 ? 768 : 1152;
+export function expectedWidth(_path: string, viewport: number) {
+  const cap = viewport < 768 ? 512 : viewport < 1024 ? 768 : 1152;
   return Math.min(viewport, cap);
 }
 

@@ -6,6 +6,7 @@ import { RequestError } from '@/components/common/request-error';
 import { categoryDistribution } from '../adapters/category-distribution';
 import { StatisticCard } from './statistic-card';
 import { CategoryDistribution } from './category-distribution';
+import { ContentSkeleton } from '@/components/common/content-skeleton';
 
 export function SettingsStatistics() {
   const summary = useCategorySummary();
@@ -45,9 +46,7 @@ export function SettingsStatistics() {
     ) : usage.error ? (
       '조회 실패'
     ) : (
-      <span role="status" className="text-sm">
-        불러오는 중…
-      </span>
+      <ContentSkeleton text="불러오는 중…" variant="value" />
     );
   const result =
     summary.data && categories.data
@@ -72,9 +71,7 @@ export function SettingsStatistics() {
               ) : summary.error ? (
                 '조회 실패'
               ) : (
-                <span className="text-sm" role="status">
-                  불러오는 중…
-                </span>
+                <ContentSkeleton text="불러오는 중…" variant="value" />
               )
             }
           />
@@ -159,9 +156,7 @@ export function SettingsStatistics() {
             retry={retry}
           />
         ) : !summary.error && !categories.error ? (
-          <p role="status" className="text-sm text-muted-foreground">
-            링크 분포를 불러오는 중…
-          </p>
+          <ContentSkeleton text="링크 분포를 불러오는 중…" variant="chart" />
         ) : null}
       </section>
     </>

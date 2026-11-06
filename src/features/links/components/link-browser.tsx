@@ -86,7 +86,10 @@ export function LinkBrowser({
   const results = (
     <>
       {data.isPending ? (
-        <LinkListSkeleton text="링크를 불러오고 있어요." />
+        <LinkListSkeleton
+          text="링크를 불러오고 있어요."
+          compact={Boolean(controls)}
+        />
       ) : (
         <>
           {data.error && (

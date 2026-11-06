@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation';
 import { useNavigationGuard } from './navigation-guard';
 import { House, Folder, Link2, Settings2 } from 'lucide-react';
 import { profileClasses, type LayoutProfile } from './app-layout-policy';
+import { LaunchToggle } from '@/features/link-launch/launch-toggle';
 
 const destinations = [
   { href: '/', label: '홈', icon: House },
@@ -15,14 +16,14 @@ const destinations = [
 
 // One menu/active state/guard at every size; only its CSS placement changes.
 // Explicit tabIndex=0 keeps links in WebKit's keyboard navigation as well.
-// The desktop bar stays centered at 1152px even over a Compact (512px) page.
+// The desktop bar fills the same responsive frame as every page body.
 export function BottomNavigation({ profile }: { profile: LayoutProfile }) {
   const pathname = usePathname();
   const guard = useNavigationGuard();
   return (
     <nav
       aria-label="주요 메뉴"
-      className={`bottom-safe fixed bottom-0 left-1/2 z-30 grid w-full -translate-x-1/2 grid-cols-4 border-t bg-background px-3 pt-2 lg:static lg:ml-[calc((100%_-_min(100vw,72rem))_/_2)] lg:flex lg:h-16 lg:w-[min(100vw,72rem)] lg:max-w-none lg:translate-x-0 lg:items-center lg:justify-between lg:gap-6 lg:border-t-0 lg:border-b lg:px-6 lg:py-0 ${profileClasses[profile]}`}
+      className={`bottom-safe fixed bottom-0 left-1/2 z-30 grid w-full -translate-x-1/2 grid-cols-4 border-t bg-background px-3 pt-2 lg:static lg:flex lg:h-16 lg:max-w-none lg:translate-x-0 lg:items-center lg:justify-between lg:gap-6 lg:border-t-0 lg:border-b lg:px-6 lg:py-0 ${profileClasses[profile]}`}
     >
       <Link
         href="/"
@@ -77,6 +78,7 @@ export function BottomNavigation({ profile }: { profile: LayoutProfile }) {
             </Link>
           );
         })}
+        <LaunchToggle />
       </div>
     </nav>
   );

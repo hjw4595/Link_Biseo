@@ -15,7 +15,7 @@ import { EmptyState } from '@/components/common/empty-state';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Skeleton } from '@/components/ui/skeleton';
+import { ContentSkeleton } from '@/components/common/content-skeleton';
 import {
   AppSheet,
   AppSheetHeader,
@@ -236,7 +236,9 @@ function LinkDetailController({
             backHref="/links"
           />
         )}
-        <AppSheetContent className={sheet ? undefined : 'screen-content'}>
+        <AppSheetContent
+          className={sheet ? undefined : 'screen-content md:px-6'}
+        >
           {!response ? (
             denied &&
             query.error instanceof LinkApiError &&
@@ -253,12 +255,10 @@ function LinkDetailController({
                 }}
               />
             ) : (
-              <div role="status" className="space-y-5 py-4">
-                <span className="sr-only">링크를 불러오고 있어요.</span>
-                <Skeleton className="h-8 w-2/3" />
-                <Skeleton className="h-5 w-full" />
-                <Skeleton className="h-24 w-full" />
-              </div>
+              <ContentSkeleton
+                text="링크를 불러오고 있어요."
+                variant="detail"
+              />
             )
           ) : (
             <form
@@ -314,7 +314,7 @@ function LinkDetailController({
           )}
         </AppSheetContent>
         {response && (
-          <AppSheetFooter>
+          <AppSheetFooter className={sheet ? undefined : 'md:px-6'}>
             {editing ? (
               <>
                 <Button

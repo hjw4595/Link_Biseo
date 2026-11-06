@@ -6,15 +6,22 @@ import { ApiRequestError } from '@/lib/api/client';
 import { LinkApiError } from '@/lib/api/links';
 import { safeExternalUrl } from '@/lib/url';
 import type { OpenActivation, OpenTarget } from './components/external-link';
+import {
+  useIncognito,
+  isIncognitoActive,
+} from '@/features/link-launch/provider';
 
 type OpenState = {
   link: OpenTarget;
   pending: boolean;
   error?: string;
   canContinue: boolean;
+  incognito?: boolean;
 };
 export function useLinkOpen() {
   const mutation = useLinkMutation();
+  const { controller: launcher } = useIncognito();
+  const secretBusy = useRef(false);
   const scope = useRequestScope();
   const [state, setState] = useState<OpenState | null>(null);
   const sequence = useRef(0);
@@ -65,6 +72,42 @@ export function useLinkOpen() {
   const activate: OpenActivation = (link, mode) => {
     const safe = safeExternalUrl(link.url);
     if (!safe || scope().aborted) return;
+    if (launcher && isIncognitoActive(launcher)) {
+      if (secretBusy.current) return;
+      secretBusy.current = true;
+      const ticket = ++sequence.current;
+      const controller = new AbortController();
+      attempts.current.add(controller);
+      const signal = AbortSignal.any([scope(), controller.signal]);
+      setState({ link, pending: true, canContinue: false, incognito: true });
+      void (async () => {
+        let opened = false;
+        try {
+          await launcher.execute([safe.href], signal);
+          if (signal.aborted) return;
+          opened = true;
+          await mutation.mutateAsync({ type: 'open', id: link.id, signal });
+          if (ticket === sequence.current && !signal.aborted) setState(null);
+        } catch (error) {
+          if (ticket === sequence.current && !signal.aborted)
+            setState({
+              link,
+              pending: false,
+              canContinue: false,
+              incognito: true,
+              error: opened
+                ? '시크릿 창은 열렸지만 사용 기록 저장 여부를 확인할 수 없어요. 창을 다시 열지 않아요.'
+                : error instanceof Error
+                  ? error.message
+                  : '시크릿 실행 결과를 확인할 수 없어요. 자동으로 다시 열지 않아요.',
+            });
+        } finally {
+          secretBusy.current = false;
+          attempts.current.delete(controller);
+        }
+      })();
+      return;
+    }
     const ticket = ++sequence.current;
     const controller = new AbortController();
     attempts.current.add(controller);

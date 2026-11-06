@@ -14,7 +14,7 @@ export function AppShell({
   navigation?: boolean;
 }) {
   const pathname = usePathname();
-  const profile = navigation ? layoutProfile(pathname) : 'compact';
+  const profile = layoutProfile(pathname);
   return (
     <NavigationGuardProvider>
       <LinkSaveNotice />

@@ -1,6 +1,7 @@
 'use client';
 import type { useLinkStats } from '@/lib/query/product';
 import { RequestError } from '@/components/common/request-error';
+import { ContentSkeleton } from '@/components/common/content-skeleton';
 
 export function LinkUsage({
   stats,
@@ -21,9 +22,7 @@ export function LinkUsage({
         <span className="text-meta text-muted-foreground">최근 7일</span>
       </div>
       {stats.isPending ? (
-        <p role="status" className="text-muted-foreground">
-          사용 통계를 불러오고 있어요.
-        </p>
+        <ContentSkeleton text="사용 통계를 불러오고 있어요." variant="value" />
       ) : stats.error ? (
         <RequestError
           text="사용 통계를 불러오지 못했어요."

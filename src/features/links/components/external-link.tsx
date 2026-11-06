@@ -1,6 +1,10 @@
 'use client';
 import { useState, type ReactNode } from 'react';
 import { safeExternalUrl } from '@/lib/url';
+import {
+  useIncognito,
+  isIncognitoActive,
+} from '@/features/link-launch/provider';
 
 export type OpenMode = 'current' | 'native';
 export type OpenTarget = { id: string; url: string; title: string };
@@ -27,6 +31,7 @@ export function ExternalLink({
   disabled?: boolean;
 }) {
   const [unsafe, setUnsafe] = useState(false);
+  const { controller, incognito } = useIncognito();
   const safe = safeExternalUrl(link.url);
   const accessibleLabel =
     label ?? `${link.title} 열기${newTab ? ' (새 탭)' : ''}`;
@@ -59,6 +64,36 @@ export function ExternalLink({
         )}
       </span>
     );
+  // No href in secret mode: native modifier/middle/context-menu opening must
+  // not create a regular tab alongside the extension. Preview links stay native.
+  if (incognito && onActivate)
+    return (
+      <button
+        type="button"
+        data-external-link=""
+        className={`${className ?? ''} text-left`}
+        aria-label={accessibleLabel}
+        aria-busy={busy || undefined}
+        onClick={(event) => {
+          if (event.defaultPrevented || event.altKey) return;
+          event.preventDefault();
+          onActivate(link, 'current');
+        }}
+        onMouseDown={(event) => {
+          // Buttons can enter platform autoscroll without emitting auxclick.
+          if (event.button === 1) event.preventDefault();
+        }}
+        onMouseUp={(event) => {
+          if (event.defaultPrevented || event.button !== 1 || event.altKey)
+            return;
+          event.preventDefault();
+          onActivate(link, 'current');
+        }}
+        onAuxClick={(event) => event.preventDefault()}
+      >
+        {children}
+      </button>
+    );
   return (
     <a
       data-external-link=""
@@ -75,13 +110,17 @@ export function ExternalLink({
         const native =
           newTab || event.ctrlKey || event.metaKey || event.shiftKey;
         if (onActivate) {
-          if (!native) event.preventDefault();
-          onActivate(link, native ? 'native' : 'current');
+          const secret = isIncognitoActive(controller);
+          if (!native || secret) event.preventDefault();
+          onActivate(link, native && !secret ? 'native' : 'current');
         }
       }}
       onAuxClick={(event) => {
-        if (!event.defaultPrevented && event.button === 1 && !event.altKey)
+        if (!event.defaultPrevented && event.button === 1 && !event.altKey) {
+          if (onActivate && isIncognitoActive(controller))
+            event.preventDefault();
           onActivate?.(link, 'native');
+        }
       }}
     >
       {children}

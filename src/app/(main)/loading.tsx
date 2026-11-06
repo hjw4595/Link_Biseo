@@ -1,17 +1,22 @@
-import { Skeleton } from '@/components/ui/skeleton';
-import { CategoryBentoSkeleton } from '@/features/categories/components/category-skeleton';
+import { TopBar } from '@/components/common/top-bar';
 import { LinkListSkeleton } from '@/features/links/components/link-skeleton';
 export default function Loading() {
   return (
-    <div className="screen-content">
-      <Skeleton className="h-6 w-24" />
-      <div className="space-y-3">
-        <Skeleton className="h-8 w-40" />
-        <Skeleton className="h-4 w-3/4" />
+    <>
+      <TopBar title="홈" />
+      <div className="screen-content">
+        <section className="space-y-3" aria-labelledby="loading-favorites">
+          <h2 id="loading-favorites" className="font-semibold">
+            즐겨찾기
+          </h2>
+          <LinkListSkeleton
+            count={6}
+            compact
+            grid
+            text="즐겨찾기를 불러오고 있어요."
+          />
+        </section>
       </div>
-      <CategoryBentoSkeleton text="카테고리를 불러오고 있어요." />
-      <Skeleton className="h-5 w-24" />
-      <LinkListSkeleton count={3} text="링크를 불러오고 있어요." />
-    </div>
+    </>
   );
 }

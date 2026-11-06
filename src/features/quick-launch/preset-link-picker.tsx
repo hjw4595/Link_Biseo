@@ -1,4 +1,5 @@
 'use client';
+import { ContentSkeleton } from '@/components/common/content-skeleton';
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -96,7 +97,7 @@ export function PresetLinkPicker({
           </p>
         )}
         {waiting || links.isPending ? (
-          <p role="status">링크를 불러오고 있어요.</p>
+          <ContentSkeleton text="링크를 불러오고 있어요." compact />
         ) : links.error ? (
           <RequestError
             text={linkErrorMessage(links.error)}

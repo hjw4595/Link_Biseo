@@ -307,7 +307,9 @@ for (const width of [320, 375, 390, 430, 512, 1440]) {
       await page.evaluate(() => document.documentElement.scrollWidth),
     ).toBeLessThanOrEqual(width);
     const shell = await page.getByRole('main').boundingBox();
-    expect(shell?.width).toBeLessThanOrEqual(512);
+    expect(shell?.width).toBe(
+      Math.min(width, width < 768 ? 512 : width < 1024 ? 768 : 1152),
+    );
     for (const label of ['이메일', '비밀번호']) {
       const box = await page.getByLabel(label, { exact: true }).boundingBox();
       expect(box).not.toBeNull();

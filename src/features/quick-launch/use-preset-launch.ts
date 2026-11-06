@@ -10,12 +10,20 @@ import { queryKeys } from '@/lib/query/keys';
 import { markUsageSummaryStale } from '@/lib/query/usage-summary';
 import { markOrganizationReportsStale } from '@/lib/query/organization';
 import type { LinkResponse } from '@/contracts/links';
+import {
+  useIncognito,
+  isIncognitoActive,
+} from '@/features/link-launch/provider';
 type Result = {
   link: LinkResponse;
   attempted: boolean;
   record: 'pending' | 'saved' | 'unverified' | 'skipped';
 };
 export function usePresetLaunch() {
+  const { controller: launcher, incognito } = useIncognito();
+  const secretBusy = useRef(false);
+  const [error, setError] = useState('');
+  const [secretResult, setSecretResult] = useState(false);
   const { user } = useAuth(),
     cache = useQueryClient(),
     scope = useRequestScope();
@@ -69,6 +77,47 @@ export function usePresetLaunch() {
       local.current.signal.aborted
     )
       return;
+    if (launcher && isIncognitoActive(launcher)) {
+      if (secretBusy.current) return;
+      secretBusy.current = true;
+      setLocked(true);
+      setError('');
+      setSecretResult(true);
+      setResults([]);
+      const ticket = ++generation.current;
+      const snapshot = [...links];
+      const signal = AbortSignal.any([scope(), local.current.signal]);
+      void (async () => {
+        try {
+          await launcher.execute(
+            snapshot.map((link) => link.url),
+            signal,
+          );
+          if (signal.aborted) return;
+          setResults(
+            snapshot.map((link) => ({
+              link,
+              attempted: true,
+              record: 'pending',
+            })),
+          );
+          snapshot.forEach((link) => record(link, ticket));
+        } catch (reason) {
+          if (!signal.aborted)
+            setError(
+              reason instanceof Error
+                ? reason.message
+                : '시크릿 실행 결과를 확인할 수 없어요.',
+            );
+        } finally {
+          secretBusy.current = false;
+          if (!signal.aborted) setLocked(false);
+        }
+      })();
+      return;
+    }
+    setError('');
+    setSecretResult(false);
     lock.current = Date.now() + 1000;
     setLocked(true);
     timer.current = setTimeout(() => setLocked(false), 1000);
@@ -90,8 +139,20 @@ export function usePresetLaunch() {
       .forEach((row) => record(row.link, ticket));
   }
   function recordIndividual(link: LinkResponse) {
+    if (isIncognitoActive(launcher)) {
+      launch([link]);
+      return;
+    }
     if (!safeExternalUrl(link.url) || scope().aborted) return;
     record(link, generation.current);
   }
-  return { results, locked, launch, recordIndividual };
+  return {
+    results,
+    locked,
+    launch,
+    recordIndividual,
+    error,
+    incognito,
+    secretResult,
+  };
 }
