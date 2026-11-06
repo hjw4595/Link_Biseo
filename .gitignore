@@ -14,3 +14,9 @@ test-results/
 playwright-report/
 artifacts/
 docs/
+
+# Local agent instructions and internal work reports
+AGENTS.md
+**/AGENTS.md
+WO-*.md
+*-REPORT.md
