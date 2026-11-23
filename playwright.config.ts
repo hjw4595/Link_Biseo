@@ -23,6 +23,7 @@ export default defineConfig({
       url: 'http://localhost:3100/login',
       env: {
         NEXT_DIST_DIR: '.next/playwright',
+        ENABLE_DEV_PREVIEWS: process.env.ENABLE_DEV_PREVIEWS ?? 'true',
         NEXT_PUBLIC_SUPABASE_URL: 'http://127.0.0.1:54329',
         NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: 'sb_publishable_test_only',
         NEXT_PUBLIC_SUPABASE_ANON_KEY: '',

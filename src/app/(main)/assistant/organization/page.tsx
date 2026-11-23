@@ -1,5 +1,5 @@
 import { OrganizationScreen } from '@/screens/organization/organization-screen';
-import { CleanupPreview } from '@/screens/dev/cleanup/cleanup-preview';
+import { devPreviewsEnabled } from '@/screens/dev/access';
 
 export default async function OrganizationPage({
   searchParams,
@@ -8,7 +8,10 @@ export default async function OrganizationPage({
 }) {
   const params = await searchParams;
   // Legacy Cleanup regression preview uses the normal MainLayout auth guard.
-  if (process.env.NODE_ENV === 'development' && params.preview === 'cleanup')
+  if (devPreviewsEnabled() && params.preview === 'cleanup') {
+    const { CleanupPreview } =
+      await import('@/screens/dev/cleanup/cleanup-preview');
     return <CleanupPreview />;
+  }
   return <OrganizationScreen />;
 }

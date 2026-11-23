@@ -1,8 +1,9 @@
 import { notFound } from 'next/navigation';
-import { UiPreview } from '@/screens/dev/ui-preview';
+import { devPreviewsEnabled } from '@/screens/dev/access';
 
 export const dynamic = 'force-dynamic';
-export default function UiPreviewPage() {
-  if (process.env.NODE_ENV !== 'development') notFound();
+export default async function UiPreviewPage() {
+  if (!devPreviewsEnabled()) notFound();
+  const { UiPreview } = await import('@/screens/dev/ui-preview');
   return <UiPreview />;
 }

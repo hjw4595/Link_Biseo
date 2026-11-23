@@ -7,9 +7,6 @@ type DemoContextValue = {
   categories: DemoCategory[];
   links: DemoLink[];
   toggleFavorite: (id: string) => void;
-  addLink: (link: DemoLink) => void;
-  removeLink: (id: string) => void;
-  reset: () => void;
 };
 const DemoContext = createContext<DemoContextValue | null>(null);
 
@@ -26,10 +23,6 @@ export function DemoProvider({ children }: { children: ReactNode }) {
               item.id === id ? { ...item, favorite: !item.favorite } : item,
             ),
           ),
-        addLink: (link) => setLinks((items) => [link, ...items]),
-        removeLink: (id) =>
-          setLinks((items) => items.filter((item) => item.id !== id)),
-        reset: () => setLinks(demoLinks),
       }}
     >
       {children}

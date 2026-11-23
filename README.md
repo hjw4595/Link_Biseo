@@ -129,6 +129,8 @@ pnpm build
 
 Playwright는 로컬 모의 인증·API 서버와 3100번 포트의 Next.js 개발 서버를 실행합니다. 브라우저가 설치되지 않았다면 `pnpm exec playwright install chromium`을 먼저 실행합니다. 실제 Google OAuth와 운영 확장 연동은 별도로 확인해야 합니다.
 
+개발 검증에 사용하는 `/dev/ui`와 `?preview=cleanup` 화면은 기본적으로 비활성화됩니다. 로컬에서 필요한 경우에만 서버 환경 변수 `ENABLE_DEV_PREVIEWS=true`를 설정합니다. 운영에서는 이 설정과 관계없이 데모를 표시하지 않습니다. Playwright 서버는 기존 UI 회귀 검증을 위해 해당 설정을 명시적으로 켭니다. 기본 비활성 상태를 검증하려면 `ENABLE_DEV_PREVIEWS=false`로 `tests/dev-previews.spec.ts`를 실행합니다.
+
 | 구분               | 주요 검증 내용                                              |
 | ------------------ | ----------------------------------------------------------- |
 | 인증 및 세션       | 로그인·로그아웃, 인증 상태 변경, 세션 갱신, 계정 전환       |
