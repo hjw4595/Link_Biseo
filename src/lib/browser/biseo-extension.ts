@@ -8,6 +8,7 @@ import {
 import { safeExternalUrl } from '../url';
 
 export type FailureKind =
+  | 'unavailable'
   | 'unsupported'
   | 'configuration'
   | 'transport'
@@ -53,7 +54,7 @@ function runtime() {
   const api = window.chrome?.runtime;
   if (!api || typeof api.sendMessage !== 'function')
     throw new ExtensionError(
-      'transport',
+      'unavailable',
       'Chrome 확장 프로그램을 연결할 수 없습니다.',
     );
   return api;
@@ -68,7 +69,7 @@ export function sendExtensionMessage(
   if (!id || !/^[a-p]{32}$/.test(id))
     return Promise.reject(
       new ExtensionError(
-        'configuration',
+        id ? 'configuration' : 'unavailable',
         '확장 프로그램 ID 설정을 확인해 주세요.',
       ),
     );
@@ -108,7 +109,10 @@ export function sendExtensionMessage(
         if (error || response === undefined)
           finish(
             new ExtensionError(
-              'transport',
+              error?.message ===
+                'Could not establish connection. Receiving end does not exist.'
+                ? 'unavailable'
+                : 'transport',
               'Chrome 확장 프로그램을 연결할 수 없습니다. 실행 요청 후라면 실제 창을 확인해 주세요.',
             ),
           );

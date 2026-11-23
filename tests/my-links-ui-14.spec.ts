@@ -105,9 +105,7 @@ for (const width of [320, 390, 512, 768, 1024, 1440, 1920])
       page.getByText('검색 결과가 없어요.', { exact: true }),
     ).toBeVisible();
     await shot('no-results');
-    await page
-      .getByRole('button', { name: '필터 초기화', exact: true })
-      .click();
+    await page.getByRole('button', { name: '초기화', exact: true }).click();
     await expect(page.getByTestId('link-item')).toHaveCount(8);
     await expect(page).toHaveURL('/links');
     state.links = [];

@@ -5,15 +5,16 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { LinkListSkeleton } from '@/features/links/components/link-skeleton';
 import { RequestError } from '@/components/common/request-error';
-import { useLinks, useLinkMutation } from '@/lib/query/product';
-import { linkErrorMessage } from '@/lib/api/links';
+import { useLinks, useLinkMutation } from '@/features/links/query/queries';
+import { linkErrorMessage } from '@/features/links/errors';
 import type { LinkSort } from '@/contracts/links';
 import { linkView, type LinkView } from '../types';
 import { LinkList } from './link-list';
 import { useLinkOpen } from '../use-link-open';
 import { LinkOpenFeedback } from './link-open-feedback';
-import type { LinkFilterControls } from '../use-link-filters';
+import type { LinkFilterControls } from '@/features/links/filters';
 import { LinkToolbar } from './link-toolbar';
+import { LinkRegistrationLink } from './link-registration';
 
 export function LinkBrowser({
   categoryId,
@@ -46,6 +47,15 @@ export function LinkBrowser({
   };
   const filtered = Boolean(
     current.q.trim() || current.categoryId || current.favorite,
+  );
+  const selectedCategory =
+    categoryStatus === 'success'
+      ? managementCategories?.find(
+          (category) => category.id === current.categoryId,
+        )
+      : undefined;
+  const categoryOnly = Boolean(
+    controls && selectedCategory && !current.q.trim() && !current.favorite,
   );
   const data = useLinks({
     q: current.q.trim() || undefined,
@@ -117,20 +127,39 @@ export function LinkBrowser({
               emptyTitle={
                 current.q.trim()
                   ? '검색 결과가 없어요.'
-                  : filtered
-                    ? '조건에 맞는 링크가 없어요.'
-                    : '아직 링크가 없어요'
+                  : categoryOnly
+                    ? `‘${selectedCategory?.name}’에 저장한 링크가 없어요.`
+                    : filtered
+                      ? '조건에 맞는 링크가 없어요.'
+                      : '아직 링크가 없어요'
               }
               emptyDescription={
                 current.q.trim()
                   ? '다른 검색어로 찾아보세요.'
-                  : filtered
-                    ? '다른 조건으로 찾아보세요.'
-                    : undefined
+                  : categoryOnly
+                    ? '이 카테고리에 첫 링크를 등록해 보세요.'
+                    : filtered
+                      ? '다른 조건으로 찾아보세요.'
+                      : undefined
               }
               emptyAction={
                 controls ? (
-                  filtered ? (
+                  current.q.trim() ? (
+                    <Button
+                      variant="secondary"
+                      onClick={() => controls.change({ q: '' })}
+                    >
+                      검색어 지우기
+                    </Button>
+                  ) : categoryOnly && selectedCategory ? (
+                    <Button asChild>
+                      <LinkRegistrationLink
+                        href={`/links/new?categoryId=${encodeURIComponent(selectedCategory.id)}&from=links`}
+                      >
+                        {selectedCategory.name}에 링크 등록
+                      </LinkRegistrationLink>
+                    </Button>
+                  ) : filtered ? (
                     <Button variant="secondary" onClick={controls.reset}>
                       필터 초기화
                     </Button>

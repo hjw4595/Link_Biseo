@@ -1,8 +1,8 @@
 'use client';
 import { useRef, useState } from 'react';
 import type { PresetSummary } from '@/contracts/quick-launch';
-import { usePresetMutation } from '@/lib/query/quick-launch';
-import { presetErrorMessage } from '@/lib/api/quick-launch';
+import { usePresetMutation } from '@/features/quick-launch/query/queries';
+import { presetErrorMessage } from '@/features/quick-launch/errors';
 import { Button } from '@/components/ui/button';
 import { ReorderControls } from '@/components/common/reorder-controls';
 

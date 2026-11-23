@@ -5,6 +5,7 @@ export type ApiRequestErrorKind =
   | 'forbidden'
   | 'network'
   | 'server'
+  | 'http'
   | 'invalid'
   | 'configuration'
   | 'timeout'
@@ -16,6 +17,18 @@ export class ApiRequestError extends Error {
   ) {
     super(kind);
   }
+}
+
+export function httpError(status: number): ApiRequestError {
+  const kind =
+    status === 401
+      ? 'unauthorized'
+      : status === 403
+        ? 'forbidden'
+        : status >= 500
+          ? 'server'
+          : 'http';
+  return new ApiRequestError(kind, status);
 }
 
 // One session/refresh policy for Auth and product APIs. Never retry a failed write
@@ -110,10 +123,12 @@ export async function authenticatedRequest(
       options.retryUnauthorized !== false
     )
       continue;
-    if (response.status === 401) throw new ApiRequestError('unauthorized', 401);
-    if (response.status === 403) throw new ApiRequestError('forbidden', 403);
-    if (response.status >= 500)
-      throw new ApiRequestError('server', response.status);
+    if (
+      response.status === 401 ||
+      response.status === 403 ||
+      response.status >= 500
+    )
+      throw httpError(response.status);
     return response;
   }
   throw new ApiRequestError('unauthorized');

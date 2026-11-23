@@ -6,7 +6,7 @@ import { fixtureId, initialProduct } from './product-fixture';
 import {
   categoryColor,
   categoryDistribution,
-} from '../src/features/settings/adapters/category-distribution';
+} from '../src/screens/settings/statistics/adapters/category-distribution';
 import type { CategoryResponse } from '../src/contracts/categories';
 const before = process.env.WO_UI_191_CAPTURE === 'before';
 const root = `artifacts/wo-ui-19-1/${before ? 'before' : 'after'}`;

@@ -43,9 +43,7 @@ export async function parseInBrowser(
       }
     },
     {
-      code: compile(
-        'src/features/bookmark-import/parser/parse-bookmark-html.ts',
-      ),
+      code: compile('src/screens/links/import/parser/parse-bookmark-html.ts'),
       html,
     },
   );
@@ -65,7 +63,7 @@ export async function compareInBrowser(
     },
     {
       code: compile(
-        'src/features/bookmark-import/utils/detect-import-duplicates.ts',
+        'src/screens/links/import/utils/detect-import-duplicates.ts',
       ),
       urlCode: compile('src/lib/url.ts'),
       inputs,
@@ -91,9 +89,7 @@ export async function measureParser(page: Page, html: string) {
       return { samplesMs: samples, maxMs: Math.max(...samples) };
     },
     {
-      code: compile(
-        'src/features/bookmark-import/parser/parse-bookmark-html.ts',
-      ),
+      code: compile('src/screens/links/import/parser/parse-bookmark-html.ts'),
       html,
     },
   );

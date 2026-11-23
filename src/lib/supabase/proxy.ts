@@ -2,8 +2,16 @@ import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
 import { authCookieOptions, getSupabaseConfig } from './config';
 import { isProtectedPath, safeNext } from '@/features/auth/redirect';
+import { getAuthRequestOrigin } from '@/features/auth/request-origin';
 
 export async function updateSession(request: NextRequest) {
+  const origin = getAuthRequestOrigin(request);
+  if (!origin)
+    return new NextResponse('Invalid authentication request origin', {
+      status: 400,
+      headers: { 'Cache-Control': 'private, no-store' },
+    });
+  const baseUrl = new URL(origin);
   let response = NextResponse.next({ request });
   const protectedPath = isProtectedPath(request.nextUrl.pathname);
   function finish(target?: URL) {
@@ -14,7 +22,7 @@ export async function updateSession(request: NextRequest) {
     return result;
   }
   function login(error?: string) {
-    const url = new URL('/login', request.url);
+    const url = new URL('/login', baseUrl);
     url.searchParams.set(
       'next',
       safeNext(request.nextUrl.pathname + request.nextUrl.search),
@@ -51,7 +59,7 @@ export async function updateSession(request: NextRequest) {
           : undefined,
       );
     if (user && !error && request.nextUrl.pathname === '/login')
-      return finish(new URL('/', request.url));
+      return finish(new URL('/', origin));
     return finish();
   } catch {
     return protectedPath ? login('configuration') : finish();

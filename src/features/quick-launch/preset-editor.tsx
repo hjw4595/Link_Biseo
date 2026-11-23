@@ -1,9 +1,10 @@
 'use client';
 import { useEffect, useRef, useState, type RefObject } from 'react';
 import { Button } from '@/components/ui/button';
+import { ActionButtons } from '@/components/common/action-buttons';
 import { Input } from '@/components/ui/input';
-import { usePresetMutation } from '@/lib/query/quick-launch';
-import { presetErrorMessage } from '@/lib/api/quick-launch';
+import { usePresetMutation } from '@/features/quick-launch/query/queries';
+import { presetErrorMessage } from '@/features/quick-launch/errors';
 import {
   PRESET_LINK_LIMIT,
   validPresetMembers,
@@ -253,20 +254,20 @@ export function PresetEditor({
             </fieldset>
           </AppSheetContent>
           <AppSheetFooter>
-            <Button
-              variant="ghost"
-              disabled={mutation.isPending}
-              onClick={() => closeRequestRef.current?.()}
-            >
-              취소
-            </Button>
-            <Button
-              disabled={!validPresetName(name)}
-              loading={mutation.isPending}
-              onClick={() => void save()}
-            >
-              {preset ? '변경 저장' : '추가'}
-            </Button>
+            <ActionButtons
+              cancel={{
+                variant: 'ghost',
+                disabled: mutation.isPending,
+                onClick: () => closeRequestRef.current?.(),
+                children: '취소',
+              }}
+              primary={{
+                disabled: !validPresetName(name),
+                loading: mutation.isPending,
+                onClick: () => void save(),
+                children: preset ? '변경 저장' : '추가',
+              }}
+            />
           </AppSheetFooter>
         </>
       )}

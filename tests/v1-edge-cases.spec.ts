@@ -152,6 +152,10 @@ test('same saved links can be selected for multiple same-name presets, with no d
   const state = await presetApi(page, 1);
   await page.goto('/');
   await page.getByRole('button', { name: '빠른 실행 추가' }).click();
+  await page
+    .getByRole('alertdialog', { name: '빠른 실행 팝업 허용 안내' })
+    .getByRole('button', { name: '확인', exact: true })
+    .click();
   await page.getByLabel('이름', { exact: true }).fill('업무 1');
   await page.getByRole('button', { name: '+ 링크 추가', exact: true }).click();
   const name = state.items[0]?.links[0]?.link.title;

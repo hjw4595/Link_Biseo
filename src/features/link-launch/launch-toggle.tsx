@@ -9,6 +9,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { useLaunch } from './provider';
 import { IncognitoIcon } from './incognito-icon';
+import { NoticeDialog } from '@/components/common/notice-dialog';
 
 export function LaunchToggle() {
   const controller = useLaunch();
@@ -26,12 +27,7 @@ function Toggle({
   const notice = useStore(store, (state) => state.notice);
   const checking = connection === 'checking';
   const denied = permission === 'denied';
-  const installUrl = process.env.NEXT_PUBLIC_BISEO_EXTENSION_INSTALL_URL;
-  const safeInstall = installUrl?.startsWith(
-    'https://chromewebstore.google.com/',
-  )
-    ? installUrl
-    : null;
+  const unavailable = connection === 'unavailable';
   return (
     <div className="hidden lg:block">
       <Button
@@ -68,8 +64,22 @@ function Toggle({
           확장 프로그램과 권한을 확인하고 있어요. 다시 누르면 취소해요.
         </span>
       )}
+      <NoticeDialog
+        open={notice !== null && unavailable}
+        onOpenChange={(open) => {
+          if (!open) store.getState().update({ notice: null });
+        }}
+        title="확장 프로그램 배포 준비 중"
+        description={
+          <>
+            Chrome 확장 프로그램을 준비하고 있어요.
+            <br />
+            배포가 완료되면 시크릿 창에서 링크를 실행할 수 있습니다.
+          </>
+        }
+      />
       <AlertDialog
-        open={notice !== null}
+        open={notice !== null && !unavailable}
         onOpenChange={(open) => {
           if (!open) store.getState().update({ notice: null });
         }}
@@ -96,30 +106,11 @@ function Toggle({
                   <li>링크비서로 돌아와 연결 확인</li>
                 </ol>
               ) : (
-                <>
-                  {safeInstall ? (
-                    <a
-                      href={safeInstall}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-accent underline"
-                    >
-                      확장 프로그램 설치
-                    </a>
-                  ) : (
-                    <p>
-                      웹 스토어 설치 링크는 준비 중이에요. 개발 환경에서는
-                      biseo_ex에서 빌드한 .output/chrome-mv3 폴더를 Chrome 확장
-                      프로그램 관리의 개발자 모드 → 압축해제된 확장 프로그램을
-                      로드합니다로 설치해 주세요.
-                    </p>
-                  )}
-                  <p>
-                    동일 Chrome 프로필의 확장 활성화 여부, 확장 ID 설정과 웹앱
-                    주소를 확인해 주세요. 연결 실패가 반드시 미설치를 의미하지는
-                    않아요.
-                  </p>
-                </>
+                <p>
+                  동일 Chrome 프로필의 확장 활성화 여부, 확장 ID 설정과 웹앱
+                  주소를 확인해 주세요. 연결 실패가 반드시 미설치를 의미하지는
+                  않아요.
+                </p>
               )}
             </div>
           }

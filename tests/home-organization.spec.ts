@@ -57,6 +57,27 @@ test('existing report sections deduplicate IDs, honor Off and bound returned row
     reportToCandidateLinks(organizationReport(model(0))).links,
   ).toHaveLength(0);
 });
+
+test('candidate reasons retain overlapping server classifications and remove dismissed IDs', () => {
+  const state = model(2);
+  state.links[1]!.domain = 'example.com';
+  const report = organizationReport(state);
+  const values = reportToCandidateLinks(report);
+  const id = state.links[1]!.id.toLowerCase();
+  expect(
+    values.links.filter((link) => link.id.toLowerCase() === id),
+  ).toHaveLength(1);
+  expect(values.reasons.get(id)).toEqual([
+    '카테고리가 지정되지 않았어요',
+    '14일 이상 사용하지 않았어요',
+    '사이트 정보를 가져오지 못했어요',
+  ]);
+  expect(reportToCandidateLinks(report, [id]).reasons.has(id)).toBe(false);
+  state.cleanupThresholdDays = null;
+  expect(
+    reportToCandidateLinks(organizationReport(state)).reasons.get(id),
+  ).not.toContain('14일 이상 사용하지 않았어요');
+});
 for (const width of [320, 390, 512, 768, 1024, 1440, 1920])
   test(`Home recommendations, detail, confirm and clean My Links ${width}`, async ({
     page,

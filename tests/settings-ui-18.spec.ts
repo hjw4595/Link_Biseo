@@ -7,8 +7,8 @@ import type { CategoryResponse } from '../src/contracts/categories';
 import {
   categoryDistribution,
   categoryColor,
-} from '../src/features/settings/adapters/category-distribution';
-import { accountConnection } from '../src/features/auth/account-connection';
+} from '../src/screens/settings/statistics/adapters/category-distribution';
+import { accountConnection } from '../src/screens/settings/account/account-connection';
 import { expectClearOfNavigation } from './layout-assertions';
 const headers = { 'Access-Control-Allow-Origin': 'http://localhost:3100' };
 const category = (name: string, sortOrder = 0): CategoryResponse => ({

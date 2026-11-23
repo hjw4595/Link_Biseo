@@ -1,5 +1,5 @@
-import { OrganizationReport } from '@/features/organization/components/organization-report';
-import { CleanupPreview } from '@/features/organization/components/cleanup-preview';
+import { OrganizationScreen } from '@/screens/organization/organization-screen';
+import { CleanupPreview } from '@/screens/dev/cleanup/cleanup-preview';
 
 export default async function OrganizationPage({
   searchParams,
@@ -10,5 +10,5 @@ export default async function OrganizationPage({
   // Legacy Cleanup regression preview uses the normal MainLayout auth guard.
   if (process.env.NODE_ENV === 'development' && params.preview === 'cleanup')
     return <CleanupPreview />;
-  return <OrganizationReport />;
+  return <OrganizationScreen />;
 }

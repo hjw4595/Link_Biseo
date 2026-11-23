@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation';
-import { UiPreview } from '@/components/common/ui-preview';
+import { UiPreview } from '@/screens/dev/ui-preview';
 
 export const dynamic = 'force-dynamic';
 export default function UiPreviewPage() {

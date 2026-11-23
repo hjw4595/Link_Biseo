@@ -1,5 +1,6 @@
 'use client';
 import { Zap } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import { LinkRegistrationLink } from '@/features/links/components/link-registration';
 import { useRef, useState, type RefObject } from 'react';
 import { useIsMutating } from '@tanstack/react-query';
@@ -10,8 +11,8 @@ import {
   AppSheetHeader,
 } from '@/components/common/app-sheet';
 import { RequestError } from '@/components/common/request-error';
-import { usePresets, usePreset } from '@/lib/query/quick-launch';
-import { presetErrorMessage } from '@/lib/api/quick-launch';
+import { usePresets, usePreset } from '@/features/quick-launch/query/queries';
+import { presetErrorMessage } from '@/features/quick-launch/errors';
 import type { PresetDetail, PresetSummary } from '@/contracts/quick-launch';
 import { PresetReorder } from './preset-reorder';
 import { PresetEditor } from './preset-editor';
@@ -19,6 +20,7 @@ import { PresetCard } from './preset-card';
 import { useDesktopHome } from './use-desktop-home';
 import { SectionHeader } from '@/components/common/section-header';
 import { ContentSkeleton } from '@/components/common/content-skeleton';
+import { NoticeDialog } from '@/components/common/notice-dialog';
 
 function ExistingEditor({
   id,
@@ -64,12 +66,16 @@ function ExistingEditor({
 }
 
 export function QuickLaunch() {
+  const router = useRouter();
+  const faqRequested = useRef(false);
   const desktop = useDesktopHome();
   const closeRequestRef = useRef<(() => void) | null>(null);
   const list = usePresets(desktop);
   const [reordering, setReordering] = useState<PresetSummary[] | null>(null);
   const reorderTrigger = useRef<HTMLButtonElement>(null);
   const [editor, setEditor] = useState<string | null>(null);
+  const [popupNotice, setPopupNotice] = useState(false);
+  const continueCreation = useRef(false);
   const [message, setMessage] = useState('');
   function closeEditor(message?: string) {
     setEditor(null);
@@ -141,7 +147,8 @@ export function QuickLaunch() {
                     onClick={(e) => {
                       trigger.current = e.currentTarget;
                       setMessage('');
-                      setEditor('new');
+                      continueCreation.current = true;
+                      setPopupNotice(true);
                     }}
                   >
                     빠른 실행 추가
@@ -234,6 +241,50 @@ export function QuickLaunch() {
           </p>
         </section>
       )}
+      <NoticeDialog
+        open={popupNotice}
+        onOpenChange={setPopupNotice}
+        title="빠른 실행 팝업 허용 안내"
+        secondaryAction={
+          <Button
+            variant="ghost"
+            onClick={() => {
+              continueCreation.current = false;
+              faqRequested.current = true;
+              setPopupNotice(false);
+            }}
+          >
+            자세한 설정 방법 보기
+          </Button>
+        }
+        description={
+          <div className="space-y-3">
+            <p>
+              여러 링크를 한 번에 열 때 브라우저가 일부 탭을 차단할 수 있어요.
+            </p>
+            <p>
+              Chrome 주소창 왼쪽의 사이트 정보에서 사이트 설정을 열고, 팝업 및
+              리디렉션을 허용으로 변경해 주세요.
+            </p>
+            <p>
+              같은 브라우저 프로필에서는 링크비서 사이트에 한 번 허용하면 이후
+              추가한 링크에도 적용돼요.
+            </p>
+          </div>
+        }
+        onCloseAutoFocus={(event) => {
+          if (faqRequested.current) {
+            event.preventDefault();
+            faqRequested.current = false;
+            router.push('/settings?faq=popup#faq-popup');
+            return;
+          }
+          if (!continueCreation.current) return;
+          event.preventDefault();
+          continueCreation.current = false;
+          setEditor('new');
+        }}
+      />
       <AppSheet
         open={editor !== null}
         busy={writes > 0}

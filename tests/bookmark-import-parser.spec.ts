@@ -10,8 +10,8 @@ import {
   bookmarkComparisonKey,
   buildImportItems,
   compareExisting,
-} from '../src/features/bookmark-import/utils/detect-import-duplicates';
-import type { ParsedBookmark } from '../src/features/bookmark-import/types';
+} from '../src/screens/links/import/utils/detect-import-duplicates';
+import type { ParsedBookmark } from '../src/screens/links/import/types';
 import { mkdirSync, writeFileSync } from 'node:fs';
 
 test('Chrome export preserves nested/empty folders, order, Unicode and raw dates/query/hash', async ({

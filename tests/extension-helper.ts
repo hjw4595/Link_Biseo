@@ -23,12 +23,22 @@ export async function mockExtension(page: Page, scenario = 'success') {
       return null;
     };
     const runtime = {
+      lastError: undefined as { message: string } | undefined,
       sendMessage(
         _id: string,
         message: ExtensionRequest,
         callback: (value: unknown) => void,
       ) {
         probe.calls.push(message);
+        if (probe.scenario === 'unavailable') {
+          runtime.lastError = {
+            message:
+              'Could not establish connection. Receiving end does not exist.',
+          };
+          callback(undefined);
+          runtime.lastError = undefined;
+          return;
+        }
         if (probe.scenario === 'transport') {
           callback(undefined);
           return;

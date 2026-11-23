@@ -1,5 +1,5 @@
 'use client';
-import type { useLinkStats } from '@/lib/query/product';
+import type { useLinkStats } from '@/features/links/query/queries';
 import { RequestError } from '@/components/common/request-error';
 import { ContentSkeleton } from '@/components/common/content-skeleton';
 

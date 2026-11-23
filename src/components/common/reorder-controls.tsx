@@ -2,6 +2,7 @@
 import { useLayoutEffect, useRef } from 'react';
 import { ArrowUp, ArrowDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 
 export function ReorderControls({
   itemLabel,
@@ -10,6 +11,7 @@ export function ReorderControls({
   onMoveUp,
   onMoveDown,
   disabled = false,
+  className,
 }: {
   itemLabel: string;
   canMoveUp: boolean;
@@ -17,6 +19,7 @@ export function ReorderControls({
   onMoveUp: () => void;
   onMoveDown: () => void;
   disabled?: boolean;
+  className?: string;
 }) {
   const up = useRef<HTMLButtonElement>(null),
     down = useRef<HTMLButtonElement>(null);
@@ -35,7 +38,7 @@ export function ReorderControls({
     moved.current = null;
   });
   return (
-    <div className="flex shrink-0 gap-2">
+    <div className={cn('flex shrink-0 gap-2', className)}>
       <Button
         ref={up}
         type="button"

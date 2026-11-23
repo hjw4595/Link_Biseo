@@ -146,6 +146,10 @@ test('create empty preset in one POST; duplicate names and shared links allowed'
   const state = await presetApi(page, 0);
   await page.goto('/');
   await page.getByRole('button', { name: '빠른 실행 추가' }).click();
+  await page
+    .getByRole('alertdialog', { name: '빠른 실행 팝업 허용 안내' })
+    .getByRole('button', { name: '확인', exact: true })
+    .click();
   await page.getByLabel('이름', { exact: true }).fill('업무');
   await page.getByRole('button', { name: '추가', exact: true }).click();
   await expect(page.getByRole('dialog')).toHaveCount(0);
@@ -308,6 +312,10 @@ test('account switch discards preset draft', async ({ page, context }) => {
   await presetApi(page, 0);
   await page.goto('/');
   await page.getByRole('button', { name: '빠른 실행 추가' }).click();
+  await page
+    .getByRole('alertdialog', { name: '빠른 실행 팝업 허용 안내' })
+    .getByRole('button', { name: '확인', exact: true })
+    .click();
   await page.getByLabel('이름', { exact: true }).fill('사용자 A 초안');
   await authenticate(context, false, 'alternate');
   await page.evaluate(() => window.dispatchEvent(new Event('focus')));
@@ -334,6 +342,10 @@ test('8 members limit preserves selection across cursor pages', async ({
     }));
   }
   await page.getByRole('button', { name: '빠른 실행 추가' }).click();
+  await page
+    .getByRole('alertdialog', { name: '빠른 실행 팝업 허용 안내' })
+    .getByRole('button', { name: '확인', exact: true })
+    .click();
   await page.getByRole('button', { name: '+ 링크 추가', exact: true }).click();
   const boxes = page
     .getByRole('list', { name: '등록된 링크 선택' })

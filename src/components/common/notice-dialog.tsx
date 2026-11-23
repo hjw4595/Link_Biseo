@@ -1,5 +1,5 @@
 'use client';
-import { useRef, type ReactNode } from 'react';
+import { useRef, type ComponentProps, type ReactNode } from 'react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -13,12 +13,18 @@ export function NoticeDialog({
   title,
   description,
   confirmLabel = '확인',
+  onCloseAutoFocus,
+  secondaryAction,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   title: string;
   description?: ReactNode;
   confirmLabel?: string;
+  secondaryAction?: ReactNode;
+  onCloseAutoFocus?: ComponentProps<
+    typeof AlertDialogContent
+  >['onCloseAutoFocus'];
 }) {
   const action = useRef<HTMLButtonElement>(null);
   return (
@@ -26,6 +32,7 @@ export function NoticeDialog({
       <AlertDialogContent
         title={title}
         description={description}
+        onCloseAutoFocus={onCloseAutoFocus}
         onEscapeKeyDown={(event) => {
           event.stopPropagation();
           event.preventDefault();
@@ -35,7 +42,8 @@ export function NoticeDialog({
           action.current?.focus();
         }}
       >
-        <div className="flex justify-end">
+        <div className="flex flex-wrap justify-end gap-2">
+          {secondaryAction}
           <AlertDialogAction asChild>
             <Button ref={action}>{confirmLabel}</Button>
           </AlertDialogAction>

@@ -6,9 +6,7 @@ import { useRequestScope } from '@/lib/query/provider';
 import { createClient } from '@/lib/supabase/client';
 import { openLink } from '@/lib/api/links';
 import { safeExternalUrl } from '@/lib/url';
-import { queryKeys } from '@/lib/query/keys';
-import { markUsageSummaryStale } from '@/lib/query/usage-summary';
-import { markOrganizationReportsStale } from '@/lib/query/organization';
+import { refreshOpenedLink } from '@/features/links/query/cache';
 import type { LinkResponse } from '@/contracts/links';
 import {
   useIncognito,
@@ -45,15 +43,7 @@ export function usePresetLaunch() {
     void openLink(createClient(), user.id, link.id, signal, false)
       .then(() => {
         if (signal.aborted) return;
-        markOrganizationReportsStale(cache, user.id);
-        markUsageSummaryStale(cache, user.id);
-        for (const key of [
-          queryKeys.stats(user.id, link.id),
-          queryKeys.detail(user.id, link.id),
-          queryKeys.lists(user.id),
-          queryKeys.cleanup(user.id),
-        ])
-          void cache.invalidateQueries({ queryKey: key });
+        refreshOpenedLink(cache, user.id, link.id);
         if (ticket === generation.current)
           setResults((rows) =>
             rows.map((row) =>

@@ -50,14 +50,24 @@ export function reportToCandidateLinks(
 ) {
   const removed = new Set(removedLinkIds);
   const links = new Map<string, LinkResponse>();
+  const reasons = new Map<string, string[]>();
   const sections = recommendationSections(report, recommendationPolicy);
   for (const rule of sections)
     for (const link of report[rule.section].items) {
       const id = link.id.toLowerCase();
-      if (!removed.has(id) && !links.has(id)) links.set(id, link);
+      if (removed.has(id)) continue;
+      if (!links.has(id)) links.set(id, link);
+      const reason =
+        rule.section === 'cleanupCandidates'
+          ? `${report.cleanupCandidates.thresholdDays}일 이상 사용하지 않았어요`
+          : rule.section === 'metadataFailures'
+            ? '사이트 정보를 가져오지 못했어요'
+            : '카테고리가 지정되지 않았어요';
+      reasons.set(id, [...(reasons.get(id) ?? []), reason]);
     }
   return {
     links: [...links.values()],
+    reasons,
     truncated: sections.some((rule) => report[rule.section].truncated),
   };
 }

@@ -16,6 +16,7 @@ import {
 } from '@/lib/browser/biseo-extension';
 import { useDesktopHome } from '@/features/quick-launch/use-desktop-home';
 type Controller = {
+  claimLink: (id: string) => boolean;
   store: ReturnType<typeof createLaunchStore>;
   check: () => Promise<void>;
   off: () => void;
@@ -24,6 +25,18 @@ type Controller = {
 const Context = createContext<Controller | null>(null);
 export function LaunchProvider({ children }: { children: ReactNode }) {
   const [store] = useState(createLaunchStore);
+  // Shared by all controls for this account, including across internal routes.
+  // Monotonic deadlines require no timers, persistence or render updates.
+  const linkDeadlines = useRef(new Map<string, number>());
+  function claimLink(id: string) {
+    const now = performance.now();
+    for (const [key, deadline] of linkDeadlines.current)
+      if (deadline <= now) linkDeadlines.current.delete(key);
+    const key = id.toLowerCase();
+    if (linkDeadlines.current.has(key)) return false;
+    linkDeadlines.current.set(key, now + 1000);
+    return true;
+  }
   const epoch = useRef(0),
     checking = useRef(false),
     opening = useRef(false);
@@ -82,8 +95,7 @@ export function LaunchProvider({ children }: { children: ReactNode }) {
         extensionConnection:
           error instanceof ExtensionError && error.kind === 'unsupported'
             ? 'unsupported'
-            : error instanceof ExtensionError &&
-                ['transport', 'configuration'].includes(error.kind)
+            : error instanceof ExtensionError && error.kind === 'unavailable'
               ? 'unavailable'
               : 'error',
         incognitoPermission: 'unknown',
@@ -114,7 +126,7 @@ export function LaunchProvider({ children }: { children: ReactNode }) {
     }
   }
   return (
-    <Context.Provider value={{ store, check, off, execute }}>
+    <Context.Provider value={{ store, check, off, execute, claimLink }}>
       {children}
     </Context.Provider>
   );

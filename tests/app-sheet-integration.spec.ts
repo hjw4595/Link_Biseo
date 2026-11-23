@@ -162,6 +162,10 @@ for (const width of [390, 1440]) {
     await page
       .getByRole('button', { name: '빠른 실행 추가', exact: true })
       .click();
+    await page
+      .getByRole('alertdialog', { name: '빠른 실행 팝업 허용 안내' })
+      .getByRole('button', { name: '확인', exact: true })
+      .click();
     await page.setViewportSize({ width, height: 900 });
     const create = page.getByRole('dialog', {
       name: '빠른 실행 추가',

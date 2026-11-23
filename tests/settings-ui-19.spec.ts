@@ -6,7 +6,7 @@ import { fixtureId, installProductApi } from './product-fixture';
 import {
   categoryDistribution,
   categoryColor,
-} from '../src/features/settings/adapters/category-distribution';
+} from '../src/screens/settings/statistics/adapters/category-distribution';
 import type { CategoryResponse } from '../src/contracts/categories';
 const before = process.env.WO_UI_19_CAPTURE === 'before';
 const phase = before ? 'before' : 'after';

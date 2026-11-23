@@ -13,9 +13,9 @@ import {
   folderKey,
   folderGroups,
   mappingPlan,
-} from '../src/features/bookmark-import/folder-mapping';
-import { buildImportItems } from '../src/features/bookmark-import/utils/detect-import-duplicates';
-import type { ParsedBookmark } from '../src/features/bookmark-import/types';
+} from '../src/screens/links/import/folder-mapping';
+import { buildImportItems } from '../src/screens/links/import/utils/detect-import-duplicates';
+import type { ParsedBookmark } from '../src/screens/links/import/types';
 import type { Page } from '@playwright/test';
 import { mkdirSync } from 'node:fs';
 

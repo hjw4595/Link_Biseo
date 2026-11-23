@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation';
 import { isUuid } from '@/contracts/links';
-import { CategoryScreen } from '@/features/categories/components/category-screen';
+import { CategoryScreen } from '@/screens/categories/detail/category-screen';
 
 export default async function CategoryPage({
   params,

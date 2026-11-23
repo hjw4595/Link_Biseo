@@ -238,6 +238,42 @@ test('password redirect rejects an external destination', async ({ page }) => {
   await expect(page).toHaveURL('/');
 });
 
+test('test account button logs in directly and preserves the internal return path', async ({
+  page,
+}) => {
+  let calls = 0;
+  let release: () => void = () => {};
+  const gate = new Promise<void>((resolve) => {
+    release = resolve;
+  });
+  await page.route('**/auth/v1/token?grant_type=password', async (route) => {
+    calls++;
+    expect(route.request().postDataJSON()).toMatchObject({
+      email: 'test1@google.com',
+      password: '111111',
+    });
+    await gate;
+    await route.fulfill({ json: testSession(false, 'email') });
+  });
+  await page.goto('/login?next=/settings');
+  await page
+    .getByRole('button', { name: '테스트 계정으로 로그인', exact: true })
+    .click();
+  await expect(
+    page.getByRole('button', { name: '테스트 계정 로그인 중…' }),
+  ).toBeDisabled();
+  await expect(
+    page.getByRole('button', { name: '이메일로 로그인', exact: true }),
+  ).toBeDisabled();
+  await expect(
+    page.getByRole('button', { name: 'Google로 계속하기' }),
+  ).toBeDisabled();
+  expect(calls).toBe(1);
+  release();
+  await expect(page).toHaveURL('/settings');
+  await expectAccountVerified(page);
+});
+
 test('email session refresh preserves the verified user and API identity', async ({
   page,
   context,

@@ -1,32 +1,18 @@
+import { readJsonResponse } from './response';
 import type { SupabaseClient } from '@supabase/supabase-js';
-import { authenticatedRequest, ApiRequestError } from './client';
-import { LinkApiError } from './links';
+import { authenticatedRequest } from './client';
 import {
   isCleanupResponse,
   isUserPreferences,
   type CleanupThreshold,
 } from '@/contracts/cleanup';
-async function checked<T>(
-  response: Response,
-  validate: (v: unknown) => v is T,
-) {
-  if (!response.ok) throw new LinkApiError(response.status);
-  let value: unknown;
-  try {
-    value = await response.json();
-  } catch {
-    throw new ApiRequestError('invalid');
-  }
-  if (!validate(value)) throw new ApiRequestError('invalid');
-  return value;
-}
 export async function preferences(
   client: SupabaseClient,
   userId: string,
   signal: AbortSignal,
   value?: { cleanupThresholdDays: CleanupThreshold },
 ) {
-  return checked(
+  return readJsonResponse(
     await authenticatedRequest(client, userId, '/users/me/preferences', {
       signal,
       ...(value ? { method: 'PATCH', body: value } : {}),
@@ -41,7 +27,7 @@ export async function cleanupCandidates(
   signal: AbortSignal,
   cursor?: string,
 ) {
-  return checked(
+  return readJsonResponse(
     await authenticatedRequest(client, userId, '/links/cleanup', {
       query: { timeZone, cursor, limit: 10 },
       signal,

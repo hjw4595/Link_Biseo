@@ -1,13 +1,13 @@
 'use client';
+import { presetQueryKeys } from '@/features/quick-launch/query/keys';
 import { useEffect, useRef } from 'react';
 import { ArrowUpRight, ChevronDown, LoaderCircle, Play } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
-import { usePreset } from '@/lib/query/quick-launch';
-import { queryKeys } from '@/lib/query/keys';
+import { usePreset } from '@/features/quick-launch/query/queries';
 import { useAuth } from '@/features/auth/auth-provider';
-import { PresetApiError, presetErrorMessage } from '@/lib/api/quick-launch';
+import { presetErrorMessage } from '@/features/quick-launch/errors';
 import { ApiRequestError } from '@/lib/api/client';
 import { ExternalLink } from '@/features/links/components/external-link';
 import { usePresetLaunch } from './use-preset-launch';
@@ -42,12 +42,16 @@ export function PresetCard({
   const outdated = !!detail.data && detail.data.updatedAt < preset.updatedAt;
   const { data, isFetching, isError, refetch } = detail;
   const unavailable =
-    (detail.error instanceof PresetApiError && detail.error.status === 404) ||
+    (detail.error instanceof ApiRequestError &&
+      detail.error.kind === 'http' &&
+      detail.error.status === 404) ||
     (detail.error instanceof ApiRequestError &&
       ['unauthorized', 'forbidden'].includes(detail.error.kind));
   useEffect(() => {
     if (unavailable)
-      void cache.invalidateQueries({ queryKey: queryKeys.presetList(user.id) });
+      void cache.invalidateQueries({
+        queryKey: presetQueryKeys.presetList(user.id),
+      });
   }, [unavailable, cache, user.id]);
   useEffect(() => {
     const ticket = `summary:${preset.updatedAt}`;
@@ -68,7 +72,8 @@ export function PresetCard({
     detail.isSuccess &&
     !detail.isFetching &&
     !detail.isError &&
-    !cache.getQueryState(queryKeys.preset(user.id, preset.id))?.isInvalidated &&
+    !cache.getQueryState(presetQueryKeys.preset(user.id, preset.id))
+      ?.isInvalidated &&
     !outdated;
   const initialLoading = !detail.data && detail.isFetching;
   const links = detail.data
@@ -78,7 +83,9 @@ export function PresetCard({
     : [];
   const panelId = `preset-panel-${preset.id}`;
   const canExecute = () => {
-    const current = cache.getQueryState(queryKeys.preset(user.id, preset.id));
+    const current = cache.getQueryState(
+      presetQueryKeys.preset(user.id, preset.id),
+    );
     return (
       ready &&
       current?.status === 'success' &&

@@ -3,7 +3,7 @@ import { Star, X } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useRef } from 'react';
-import { isLinkSort, type LinkFilterControls } from '../use-link-filters';
+import { isLinkSort, type LinkFilterControls } from '@/features/links/filters';
 
 export function LinkToolbar({
   controls,

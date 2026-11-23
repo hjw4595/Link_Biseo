@@ -36,7 +36,7 @@ for (const width of [320, 390, 512, 768, 1024, 1440, 1920]) {
       sheet.getByRole('heading', { name: 'ChatGPT', exact: true }),
     ).toBeVisible();
     await expect(page).toHaveURL(url);
-    await expect(sheet.getByRole('link', { name: /열기/ })).toHaveCount(0);
+    await expect(sheet.locator('[data-external-link]')).toHaveCount(0);
     await expect(sheet.getByRole('button', { name: '링크 관리' })).toHaveCount(
       0,
     );
@@ -50,6 +50,7 @@ for (const width of [320, 390, 512, 768, 1024, 1440, 1920]) {
       animations: 'disabled',
     });
     await editLinkInfo(page);
+    await expect(sheet.locator('[data-external-link]')).toHaveCount(0);
     await expect(sheet.getByLabel('제목', { exact: true })).toBeFocused();
     await expect(sheet.getByLabel('설명', { exact: true })).toBeVisible();
     await sheet.getByLabel('제목', { exact: true }).fill('수정한 ChatGPT');

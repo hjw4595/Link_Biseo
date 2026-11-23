@@ -291,7 +291,9 @@ test('cancel prevents late navigation; two independent activations retain two re
   await page.getByRole('button', { name: '열기 취소' }).click();
   releases[0]?.();
   await expect(page).toHaveURL('/links');
+  await page.waitForTimeout(1100);
   await anchor.click();
+  await page.waitForTimeout(1100);
   await anchor.click();
   await expect.poll(() => calls).toBe(3);
   releases[1]?.();
@@ -326,6 +328,7 @@ test('navigation away and account change suppress pending external navigation', 
     .click();
   releases[0]?.();
   await expect(page).toHaveURL('/');
+  await page.waitForTimeout(1100);
   await page.getByRole('link', { name: 'ChatGPT 열기', exact: true }).click();
   await expect.poll(() => calls).toBe(2);
   await authenticate(context, false, 'alternate');
@@ -457,7 +460,7 @@ test('detail deletion supports cancel/failure/pending lock and returns to a vali
   expect(deletes).toBe(2);
 });
 
-test('two native activations open two tabs and commit two records', async ({
+test('two native activations after cooldown open two tabs and commit two records', async ({
   page,
   context,
 }) => {
@@ -469,6 +472,7 @@ test('two native activations open two tabs and commit two records', async ({
     exact: true,
   });
   for (let i = 0; i < 2; i++) {
+    if (i > 0) await page.waitForTimeout(1100);
     const popup = context.waitForEvent('page');
     await anchor.click();
     await expect(await popup).toHaveURL(`${api}/external`);

@@ -113,8 +113,20 @@ test('transport rejects missing/invalid IDs before calling Chrome', async () => 
   for (const value of [undefined, '', 'bad', 'z'.repeat(32)])
     await expect(
       sendExtensionMessage(api, value, request),
-    ).rejects.toMatchObject({ kind: 'configuration' });
+    ).rejects.toMatchObject({ kind: value ? 'configuration' : 'unavailable' });
   expect(calls).toBe(0);
+});
+
+test('no receiving extension is unavailable while ambiguous transport errors remain errors', async () => {
+  const api: ExtensionRuntime = {
+    lastError: {
+      message: 'Could not establish connection. Receiving end does not exist.',
+    },
+    sendMessage: (_id, _request, callback) => callback(undefined),
+  };
+  await expect(sendExtensionMessage(api, id, request)).rejects.toMatchObject({
+    kind: 'unavailable',
+  });
 });
 test('transport handles exceptions, lastError and undefined response', async () => {
   for (const api of [

@@ -1,3 +1,4 @@
+import { organizationQueryKeys } from '../src/features/organization/query/keys';
 import { registerLink } from './link-filter-helper';
 import { categoryMenu } from './category-ui';
 import { editLinkInfo, requestLinkDeletion } from './link-actions-helper';
@@ -26,8 +27,7 @@ import {
   markOrganizationReportsStale,
   organizationRevision,
   type CachedOrganizationReport,
-} from '../src/lib/query/organization';
-import { queryKeys } from '../src/lib/query/keys';
+} from '../src/features/organization/query/cache';
 import { safeNext } from '../src/features/auth/redirect';
 import type { Page } from '@playwright/test';
 
@@ -301,30 +301,30 @@ test('stale marking touches all zones for A, preserves snapshots, never refetche
   const report = base();
   for (const zone of ['UTC', 'Asia/Seoul'])
     cache.setQueryData<CachedOrganizationReport>(
-      queryKeys.organizationReport('A', zone),
+      organizationQueryKeys.organizationReport('A', zone),
       { report, stale: false, revision: 0 },
     );
   cache.setQueryData<CachedOrganizationReport>(
-    queryKeys.organizationReport('B', 'UTC'),
+    organizationQueryKeys.organizationReport('B', 'UTC'),
     { report, stale: false, revision: 0 },
   );
   const observer = new QueryObserver(cache, {
-    queryKey: queryKeys.organizationReport('A', 'UTC'),
+    queryKey: organizationQueryKeys.organizationReport('A', 'UTC'),
     queryFn: skipToken,
   });
   const unsubscribe = observer.subscribe(() => {});
   markOrganizationReportsStale(cache, 'A');
   await cache.invalidateQueries({
-    queryKey: queryKeys.organizationReports('A'),
+    queryKey: organizationQueryKeys.organizationReports('A'),
   });
   expect(organizationRevision(cache, 'A')).toBe(1);
   for (const zone of ['UTC', 'Asia/Seoul'])
-    expect(cache.getQueryData(queryKeys.organizationReport('A', zone))).toEqual(
-      { report, stale: true, revision: 0 },
-    );
+    expect(
+      cache.getQueryData(organizationQueryKeys.organizationReport('A', zone)),
+    ).toEqual({ report, stale: true, revision: 0 });
   expect(
     cache.getQueryData<CachedOrganizationReport>(
-      queryKeys.organizationReport('B', 'UTC'),
+      organizationQueryKeys.organizationReport('B', 'UTC'),
     )?.stale,
   ).toBe(false);
   unsubscribe();

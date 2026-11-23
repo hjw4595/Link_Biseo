@@ -263,6 +263,10 @@ test('pending preset save survives breakpoint changes without duplicate submissi
   await page
     .getByRole('button', { name: '빠른 실행 추가', exact: true })
     .click();
+  await page
+    .getByRole('alertdialog', { name: '빠른 실행 팝업 허용 안내' })
+    .getByRole('button', { name: '확인', exact: true })
+    .click();
   await page.getByLabel('이름', { exact: true }).fill('저장 중 화면 전환');
   await page.getByRole('button', { name: '추가', exact: true }).click();
   try {

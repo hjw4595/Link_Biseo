@@ -1,9 +1,8 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
-import { useLinkMutation } from '@/lib/query/product';
+import { useLinkMutation } from '@/features/links/query/queries';
 import { useRequestScope } from '@/lib/query/provider';
 import { ApiRequestError } from '@/lib/api/client';
-import { LinkApiError } from '@/lib/api/links';
 import { safeExternalUrl } from '@/lib/url';
 import type { OpenActivation, OpenTarget } from './components/external-link';
 import {
@@ -155,7 +154,7 @@ export function useLinkOpen() {
           reason instanceof ApiRequestError &&
           ['network', 'timeout', 'invalid'].includes(reason.kind);
         const detail =
-          reason instanceof ApiRequestError
+          reason instanceof ApiRequestError && reason.kind !== 'http'
             ? reason.kind === 'unauthorized'
               ? ' 다시 로그인해 주세요.'
               : reason.kind === 'forbidden'
@@ -163,7 +162,9 @@ export function useLinkOpen() {
                 : reason.kind === 'timeout'
                   ? ' 응답 시간이 초과됐어요.'
                   : ''
-            : reason instanceof LinkApiError && reason.status === 404
+            : reason instanceof ApiRequestError &&
+                reason.kind === 'http' &&
+                reason.status === 404
               ? ' 링크를 찾을 수 없어요.'
               : '';
         setState({

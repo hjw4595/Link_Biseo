@@ -77,6 +77,7 @@ export function ExternalLink({
         onClick={(event) => {
           if (event.defaultPrevented || event.altKey) return;
           event.preventDefault();
+          if (controller && !controller.claimLink(link.id)) return;
           onActivate(link, 'current');
         }}
         onMouseDown={(event) => {
@@ -87,6 +88,7 @@ export function ExternalLink({
           if (event.defaultPrevented || event.button !== 1 || event.altKey)
             return;
           event.preventDefault();
+          if (controller && !controller.claimLink(link.id)) return;
           onActivate(link, 'current');
         }}
         onAuxClick={(event) => event.preventDefault()}
@@ -110,6 +112,10 @@ export function ExternalLink({
         const native =
           newTab || event.ctrlKey || event.metaKey || event.shiftKey;
         if (onActivate) {
+          if (controller && !controller.claimLink(link.id)) {
+            event.preventDefault();
+            return;
+          }
           const secret = isIncognitoActive(controller);
           if (!native || secret) event.preventDefault();
           onActivate(link, native && !secret ? 'native' : 'current');
@@ -117,6 +123,10 @@ export function ExternalLink({
       }}
       onAuxClick={(event) => {
         if (!event.defaultPrevented && event.button === 1 && !event.altKey) {
+          if (onActivate && controller && !controller.claimLink(link.id)) {
+            event.preventDefault();
+            return;
+          }
           if (onActivate && isIncognitoActive(controller))
             event.preventDefault();
           onActivate?.(link, 'native');

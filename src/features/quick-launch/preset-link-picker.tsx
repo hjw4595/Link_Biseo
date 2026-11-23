@@ -4,8 +4,9 @@ import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { RequestError } from '@/components/common/request-error';
-import { useCategories, useLinks } from '@/lib/query/product';
-import { linkErrorMessage } from '@/lib/api/links';
+import { useCategories } from '@/features/categories/query/queries';
+import { useLinks } from '@/features/links/query/queries';
+import { linkErrorMessage } from '@/features/links/errors';
 import type { LinkResponse } from '@/contracts/links';
 import { AppSheetContent, AppSheetFooter } from '@/components/common/app-sheet';
 

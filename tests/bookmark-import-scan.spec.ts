@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { scanExistingLinks } from '../src/features/bookmark-import/scan-existing-links';
+import { scanExistingLinks } from '../src/screens/links/import/scan-existing-links';
 import { initialProduct, fixtureId } from './product-fixture';
 
 function link(index: number) {

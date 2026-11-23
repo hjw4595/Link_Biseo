@@ -136,7 +136,9 @@ test('empty category, missing resources, search, keyboard and favicon fallback',
   await page.getByRole('searchbox').fill('없는 검색어');
   await expect(page.getByText('검색 결과가 없어요.')).toBeVisible();
   await expect(
-    page.getByRole('button', { name: '검색어 지우기', exact: true }),
+    page
+      .getByRole('button', { name: '검색어 지우기', exact: true })
+      .filter({ hasText: '검색어 지우기' }),
   ).toBeVisible();
   await page.getByRole('searchbox').fill('AI 리서치');
   await expect(page.getByTestId('link-item')).toHaveCount(1);

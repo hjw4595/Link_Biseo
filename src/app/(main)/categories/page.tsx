@@ -1,6 +1,5 @@
-'use client';
-import { CategoryManager } from '@/features/categories/components/category-manager';
+import { CategoriesScreen } from '@/screens/categories/categories-screen';
 
 export default function CategoriesPage() {
-  return <CategoryManager />;
+  return <CategoriesScreen />;
 }

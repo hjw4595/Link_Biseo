@@ -8,6 +8,7 @@ const toggle = (page: import('@playwright/test').Page) =>
 async function enable(page: import('@playwright/test').Page) {
   await toggle(page).click();
   await expect(toggle(page)).toHaveAttribute('aria-checked', 'true');
+  await expect(page.getByRole('alertdialog')).toHaveCount(0);
 }
 const link = (page: import('@playwright/test').Page) =>
   page.getByRole('button', { name: 'ChatGPT 열기', exact: true });
@@ -78,6 +79,7 @@ for (const scenario of [
   'denied',
   'old',
   'no-api',
+  'unavailable',
   'unsupported',
 ])
   test(`toggle keeps OFF and distinguishes ${scenario}`, async ({ page }) => {
@@ -92,9 +94,59 @@ for (const scenario of [
       );
     if (scenario === 'old')
       await expect(page.getByRole('alertdialog')).toContainText('업데이트');
-    await page.getByRole('button', { name: '닫기', exact: true }).click();
+    const unavailable = scenario === 'no-api' || scenario === 'unavailable';
+    if (unavailable) {
+      const notice = page.getByRole('alertdialog');
+      await expect(notice).toContainText('확장 프로그램 배포 준비 중');
+      await expect(notice).toContainText(
+        'Chrome 확장 프로그램을 준비하고 있어요.',
+      );
+      await expect(notice).toContainText(
+        '배포가 완료되면 시크릿 창에서 링크를 실행할 수 있습니다.',
+      );
+      await expect(notice.getByRole('button')).toHaveCount(1);
+      await expect(notice.getByRole('link')).toHaveCount(0);
+    } else if (scenario !== 'denied') {
+      await expect(page.getByRole('alertdialog')).toContainText(
+        'Chrome 확장 프로그램을 연결할 수 없습니다.',
+      );
+      await expect(page.getByRole('alertdialog')).not.toContainText(
+        '배포 준비 중',
+      );
+    }
+    await page
+      .getByRole('button', { name: unavailable ? '확인' : '닫기', exact: true })
+      .click();
     await expect(toggle(page)).toBeFocused();
   });
+
+test('deployment notice never auto-opens and preserves explicit ordinary link execution', async ({
+  page,
+  context,
+}) => {
+  const api = await installProductApi(context);
+  await mockExtension(page, 'unavailable');
+  await page.goto('/links');
+  await toggle(page).click();
+  await page.getByRole('button', { name: '확인', exact: true }).click();
+  await expect(toggle(page)).toHaveAttribute('aria-checked', 'false');
+  const anchor = page.getByRole('link', { name: 'ChatGPT 열기', exact: true });
+  await expect(anchor).toHaveAttribute('href', /chatgpt/);
+  expect(await openCalls(page)).toHaveLength(0);
+  expect(api.requests.filter((r) => r.url().endsWith('/open'))).toHaveLength(0);
+  expect(await page.evaluate(() => window.extensionProbe.windowOpens)).toBe(0);
+  const destination = await anchor.getAttribute('href');
+  if (!destination) throw new Error('Expected an ordinary link destination');
+  await page.route(destination, (route) =>
+    route.fulfill({
+      contentType: 'text/html',
+      body: '<h1>Ordinary destination</h1>',
+    }),
+  );
+  await anchor.click();
+  await expect(page).toHaveURL(destination);
+  expect(api.requests.filter((r) => r.url().endsWith('/open'))).toHaveLength(1);
+});
 test('permission retry enables without confirmation; pending cancel ignores stale permission', async ({
   page,
 }) => {
@@ -479,6 +531,8 @@ test('pending secret dispatch stays locked across internal navigation and ignore
   await expect(
     page.getByRole('heading', { name: '링크비서 홈', exact: true }),
   ).toBeVisible();
+  // Exercise the in-flight extension lock after the click cooldown expires.
+  await page.waitForTimeout(1100);
   await link(page).click();
   await expect(page.locator('p[role="alert"]')).toContainText('처리 중');
   expect((await openCalls(page)).length).toBe(1);

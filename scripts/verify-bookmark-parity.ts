@@ -31,9 +31,9 @@ const url = compile('src/lib/url.ts', () => {
   throw new Error('Unexpected URL dependency');
 });
 const frontend = compile(
-  'src/features/bookmark-import/utils/detect-import-duplicates.ts',
+  'src/screens/links/import/utils/detect-import-duplicates.ts',
   (name) => {
-    if (name !== '../../../lib/url')
+    if (name !== '../../../../lib/url')
       throw new Error('Unexpected frontend dependency');
     return url;
   },

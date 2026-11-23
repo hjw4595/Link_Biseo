@@ -4,8 +4,7 @@ import {
   classifyImportError,
   type RunItem,
   type ItemResult,
-} from '../src/features/bookmark-import/import-runner';
-import { LinkApiError } from '../src/lib/api/links';
+} from '../src/screens/links/import/import-runner';
 import { ApiRequestError } from '../src/lib/api/client';
 import { initialProduct } from './product-fixture';
 
@@ -72,14 +71,14 @@ test('runner dispatches 50 unique items through exactly two workers, preserving 
   expect(results.filter((row) => row.outcome === 'imported')).toHaveLength(50);
 });
 for (const [error, outcome, stop] of [
-  [new LinkApiError(409), 'duplicate_server', false],
-  [new LinkApiError(400), 'failed', false],
-  [new LinkApiError(404), 'failed', true],
+  [new ApiRequestError('http', 409), 'duplicate_server', false],
+  [new ApiRequestError('http', 400), 'failed', false],
+  [new ApiRequestError('http', 404), 'failed', true],
   [new ApiRequestError('unauthorized', 401), 'failed', true],
   [new ApiRequestError('forbidden', 403), 'failed', true],
   [new ApiRequestError('unauthorized'), 'unknown', true],
-  [new LinkApiError(429), 'unknown', true],
-  [new LinkApiError(418), 'unknown', true],
+  [new ApiRequestError('http', 429), 'unknown', true],
+  [new ApiRequestError('http', 418), 'unknown', true],
   [new ApiRequestError('server', 500), 'unknown', true],
   [new ApiRequestError('server', 502), 'unknown', true],
   [new ApiRequestError('server', 503), 'unknown', true],
@@ -88,7 +87,7 @@ for (const [error, outcome, stop] of [
   [new ApiRequestError('invalid'), 'unknown', true],
   [new ApiRequestError('aborted'), 'unknown', true],
 ] as const)
-  test(`classify ${error instanceof LinkApiError ? error.status : error.kind + ':' + error.status}`, () => {
+  test(`classify ${error instanceof ApiRequestError && error.kind === 'http' ? error.status : error.kind + ':' + error.status}`, () => {
     expect(classifyImportError(error)).toMatchObject({ outcome, stop });
   });
 test('stop drains already-dispatched requests; account expiry never publishes their late results', async () => {

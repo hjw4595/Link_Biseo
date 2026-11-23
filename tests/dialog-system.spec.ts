@@ -200,6 +200,10 @@ for (const width of [390, 768, 1024, 1440]) {
     }
     await page.setViewportSize({ width: 1440, height: 900 });
     await page.getByRole('button', { name: '빠른 실행 추가' }).click();
+    await page
+      .getByRole('alertdialog', { name: '빠른 실행 팝업 허용 안내' })
+      .getByRole('button', { name: '확인', exact: true })
+      .click();
     await expect(page.getByText('빠른 실행이 삭제됐어요.')).toHaveCount(0);
     await page.setViewportSize({ width, height: 900 });
     await expect(page.getByRole('dialog')).toHaveAccessibleName(

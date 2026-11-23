@@ -10,6 +10,48 @@ import {
 import { validPresetMembers } from '../src/contracts/quick-launch';
 
 const root = 'artifacts/wo-ui-04/management';
+
+test('creation shows popup guidance before the editor and preserves focus without overlapping dialogs', async ({
+  page,
+}) => {
+  const api = await presetApi(page);
+  await page.goto('/');
+  const trigger = page.getByRole('button', {
+    name: '빠른 실행 추가',
+    exact: true,
+  });
+  await trigger.click();
+  const notice = page.getByRole('alertdialog', {
+    name: '빠른 실행 팝업 허용 안내',
+  });
+  await expect(notice).toBeVisible();
+  await expect(notice).toContainText('팝업 및 리디렉션을 허용');
+  await expect(notice).toContainText('한 번 허용하면');
+  await expect(page.getByRole('dialog')).toHaveCount(0);
+  expect(
+    api.requests.filter((request) => request.method !== 'GET'),
+  ).toHaveLength(0);
+  const confirm = notice.getByRole('button', { name: '확인', exact: true });
+  await expect(confirm).toBeFocused();
+  await confirm.press('Enter');
+  const editor = page.getByRole('dialog', {
+    name: '빠른 실행 추가',
+    exact: true,
+  });
+  await expect(editor.getByLabel('이름', { exact: true })).toBeFocused();
+  await expect(page.getByRole('alertdialog')).toHaveCount(0);
+  await editor.getByRole('button', { name: '닫기', exact: true }).click();
+  await expect(trigger).toBeFocused();
+  await page
+    .getByRole('button', { name: '업무 1 펼치기', exact: true })
+    .click();
+  await page.getByRole('button', { name: '편집', exact: true }).click();
+  await expect(
+    page.getByRole('dialog', { name: '빠른 실행 편집' }),
+  ).toBeVisible();
+  await expect(page.getByRole('alertdialog')).toHaveCount(0);
+});
+
 async function shot(page: Page, name: string) {
   await mkdir(root, { recursive: true });
   await page.screenshot({
