@@ -4,15 +4,17 @@ Next.js와 TypeScript 기반으로 개발한 개인 링크 관리 웹 서비스�
 
 ## Tech Stack
 
-| 구분             | 기술                              | 용도                        |
-| ---------------- | --------------------------------- | --------------------------- |
-| Framework        | Next.js 16 (App Router), React 19 | 라우팅 및 UI 구성           |
-| Language         | TypeScript                        | 타입 안정성                 |
-| Styling          | Tailwind CSS 4, shadcn/ui         | 스타일 및 공통 UI           |
-| State Management | TanStack Query 5                  | 서버 상태 관리 및 캐싱      |
-| Authentication   | Supabase Auth                     | Google OAuth, 이메일 로그인 |
-| Visualization    | Recharts                          | 사용 통계 시각화            |
-| Testing          | Playwright                        | 기능·통합·브라우저 테스트   |
+| 구분             | 기술                                    | 용도                        |
+| ---------------- | --------------------------------------- | --------------------------- |
+| Framework        | Next.js 16.4.6 (App Router), React 19.3 | 라우팅 및 UI 구성           |
+| Language         | TypeScript                              | 타입 안정성                 |
+| Styling          | Tailwind CSS 4, shadcn/ui               | 스타일 및 공통 UI           |
+| State Management | TanStack Query 5                        | 서버 상태 관리 및 캐싱      |
+| Authentication   | Supabase Auth                           | Google OAuth, 이메일 로그인 |
+| Visualization    | Recharts                                | 사용 통계 시각화            |
+| Testing          | Playwright                              | 기능·통합·브라우저 테스트   |
+
+Next.js와 `eslint-config-next`는 보안 수정이 포함된 `16.4.6`으로 고정합니다. [공식 보안 공지](https://nextjs.org/blog/november-2026-security-release)의 수정 버전 이후 패치를 적용했습니다. 개발 도구의 취약한 간접 의존성도 갱신하도록 `typescript-eslint`를 `8.73.0`으로 업데이트했으며, 정확한 의존성 버전은 `pnpm-lock.yaml`로 관리합니다. 운영 반영에는 의존성 설치 후 재빌드·재배포가 필요합니다.
 
 ## Project Structure
 
@@ -112,7 +114,7 @@ Supabase Auth와 공통 API Client를 통해 인증 요청과 토큰 갱신, 오
 Node.js 22.14 이상과 pnpm 10을 사용합니다. 저장소 루트에서 의존성을 설치하고 `.env.example`을 `.env.local`로 복사한 뒤 Supabase 공개 인증 설정과 별도 NestJS API 주소를 입력합니다.
 
 ```sh
-pnpm install
+pnpm install --frozen-lockfile
 pnpm dev
 ```
 
