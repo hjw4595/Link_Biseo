@@ -486,15 +486,15 @@ test('preferences saving/failure screenshots and bottom actions', async ({
   await expect(
     page.getByRole('link', { name: 'API 연결 진단', exact: true }),
   ).toHaveCount(0);
-  const logout = page.getByRole('button', { name: '로그아웃', exact: true });
-  expect((await logout.boundingBox())!.y).toBeGreaterThan(
-    (await page.getByRole('region', { name: '링크 관리 설정' }).boundingBox())!
-      .y,
-  );
+  await expect(
+    page
+      .getByRole('region', { name: '계정', exact: true })
+      .getByRole('button', { name: '로그아웃', exact: true }),
+  ).toBeVisible();
   await capture(page, 'bottom-actions');
   await page.goto('/diagnostics');
   await expect(
-    page.getByRole('heading', { name: 'Foundation 상태' }),
+    page.getByRole('heading', { name: 'API 서버 상태' }),
   ).toBeVisible();
 });
 

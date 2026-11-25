@@ -353,9 +353,10 @@ for (const failure of [500, 'network'] as const) {
     await page.clock.fastForward(60000);
     expect(reads).toBe(initialReads);
     fail = true;
-    await sheet
-      .getByRole('button', { name: '정보 새로고침', exact: true })
-      .click();
+    await page.evaluate(() => {
+      window.dispatchEvent(new Event('offline'));
+      window.dispatchEvent(new Event('online'));
+    });
     await expect(sheet.getByRole('alert')).toBeVisible();
     await expect(
       sheet.getByRole('heading', { name: 'ChatGPT', exact: true }),
@@ -372,6 +373,7 @@ for (const status of [403, 404]) {
     test(`cached detail ${status} hides private content and actions while editing=${editing}`, async ({
       page,
     }) => {
+      await page.clock.install();
       let fail = false;
       await page.route(`http://127.0.0.1:54329/links/${id}`, (route) =>
         fail
@@ -401,9 +403,11 @@ for (const status of [403, 404]) {
           .fill('비공개 편집 초안');
       }
       fail = true;
-      await sheet
-        .getByRole('button', { name: '정보 새로고침', exact: true })
-        .click();
+      await page.clock.fastForward(16000);
+      await page.evaluate(() => {
+        window.dispatchEvent(new Event('offline'));
+        window.dispatchEvent(new Event('online'));
+      });
       await expect(
         sheet.getByText(
           status === 403 ? '접근 권한이 없어요.' : '링크를 찾을 수 없어요',

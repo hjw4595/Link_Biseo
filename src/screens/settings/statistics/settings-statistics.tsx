@@ -62,12 +62,12 @@ export function SettingsStatistics() {
   return (
     <>
       <section aria-labelledby="usage-statistics" className="space-y-4">
-        <h2 id="usage-statistics" className="font-semibold">
-          사용 통계
-        </h2>
-        <p className="text-meta text-muted-foreground">
-          사용한 링크와 실행 횟수는 최근 7일 기준이에요.
-        </p>
+        <div className="flex items-baseline gap-2">
+          <h2 id="usage-statistics" className="font-semibold">
+            사용 통계
+          </h2>
+          <span className="text-meta text-muted-foreground">(7일 기준)</span>
+        </div>
         <div className="grid min-w-0 gap-3 min-[390px]:grid-cols-3">
           <StatisticCard
             title="전체 링크"
@@ -93,16 +93,6 @@ export function SettingsStatistics() {
             value={usageValue(usage.data?.recent7DayOpenCount, '회')}
           />
         </div>
-        <p className="text-meta text-muted-foreground">
-          현재 저장된 링크와 남아 있는 열기 기록 기준이에요. 사용한 링크는 기간
-          내 한 번 이상 기록된 서로 다른 링크 수예요.
-        </p>
-        {usage.data && (
-          <p className="text-meta text-muted-foreground">
-            {usage.data.periodStartDate} ~ {usage.data.periodEndDate} ·{' '}
-            {usage.data.timezone}
-          </p>
-        )}
         {usage.error && (
           <RequestError
             text={

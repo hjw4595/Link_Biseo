@@ -1,6 +1,5 @@
 import { TopBar } from '@/components/common/top-bar';
 
-import { LogoutAction } from '@/screens/settings/account/logout-action';
 import { SettingsStatistics } from '@/screens/settings/statistics/settings-statistics';
 import { Account } from '@/screens/settings/account/account';
 import { CleanupPreferences } from '@/screens/settings/preferences/cleanup-preferences';
@@ -15,7 +14,6 @@ export function SettingsScreen() {
         <Account />
         <SettingsStatistics />
         <CleanupPreferences />
-        <LogoutAction />
         <SettingsFaq />
       </div>
     </>

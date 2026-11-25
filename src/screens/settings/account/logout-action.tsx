@@ -17,7 +17,6 @@ export function LogoutAction() {
   }
   return (
     <div className="space-y-3">
-      {' '}
       <Button
         variant="secondary"
         loading={pending}

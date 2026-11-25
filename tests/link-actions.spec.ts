@@ -295,6 +295,7 @@ test('background detail response cannot reset the open editor snapshot', async (
   page,
   context,
 }) => {
+  await page.clock.install();
   const fixture = await installProductApi(context);
   await openSheet(page);
   await expect(
@@ -317,9 +318,11 @@ test('background detail response cannot reset the open editor snapshot', async (
       json: { ...link, title: '늦게 도착한 서버 제목' },
     });
   });
-  await page
-    .getByRole('button', { name: '정보 새로고침', exact: true })
-    .click();
+  await page.clock.fastForward(16000);
+  await page.evaluate(() => {
+    window.dispatchEvent(new Event('offline'));
+    window.dispatchEvent(new Event('online'));
+  });
   await expect.poll(() => refreshing).toBe(true);
   await editLinkInfo(page);
   const sheet = page.getByRole('dialog');

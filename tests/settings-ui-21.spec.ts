@@ -40,8 +40,31 @@ for (const width of [320, 390, 768, 1024, 1440])
       await page.evaluate(() => document.documentElement.scrollWidth),
     ).toBeLessThanOrEqual(width);
     const account = page.getByRole('region', { name: '계정', exact: true });
-    expect((await account.boundingBox())!.height).toBeLessThan(180);
-    const logout = page.getByRole('button', { name: '로그아웃', exact: true });
+    const logout = account.getByRole('button', {
+      name: '로그아웃',
+      exact: true,
+    });
+    await expect(logout).toBeVisible();
+    const accountBox = (await account.boundingBox())!;
+    const logoutBox = (await logout.boundingBox())!;
+    expect(logoutBox.x + logoutBox.width).toBeCloseTo(
+      accountBox.x + accountBox.width,
+      0,
+    );
+    expect(logoutBox.y + logoutBox.height).toBeCloseTo(
+      accountBox.y + accountBox.height,
+      0,
+    );
+    const statistics = page.getByRole('region', {
+      name: '사용 통계',
+      exact: true,
+    });
+    await expect(
+      statistics.getByText('(7일 기준)', { exact: true }),
+    ).toBeVisible();
+    await expect(
+      statistics.getByText(/기록 기준이에요|최근 7일 기준이에요/),
+    ).toHaveCount(0);
     await logout.scrollIntoViewIfNeeded();
     const nav = await page.getByRole('navigation').boundingBox();
     const box = await logout.boundingBox();

@@ -5,6 +5,7 @@ import { UserRound } from 'lucide-react';
 import { RequestError } from '@/components/common/request-error';
 import { useAuth } from '@/features/auth/auth-provider';
 import { useAccount } from '@/features/auth/query/queries';
+import { LogoutAction } from './logout-action';
 
 function profileText(value: unknown): string | null {
   return typeof value === 'string' && value.trim() ? value : null;
@@ -33,7 +34,7 @@ export function Account() {
     '내 계정';
   const connection = accountConnection(user);
   return (
-    <section aria-label="계정" className="space-y-6">
+    <section aria-label="계정" className="space-y-4">
       <h2 className="font-semibold">계정</h2>
       <div className="flex min-w-0 flex-wrap items-center gap-3 rounded-xl border bg-surface p-4 sm:gap-4">
         <div className="flex size-12 shrink-0 items-center justify-center overflow-hidden rounded-full bg-surface text-muted-foreground">
@@ -91,6 +92,9 @@ export function Account() {
           }}
         />
       )}
+      <div className="flex justify-end text-right">
+        <LogoutAction />
+      </div>
     </section>
   );
 }

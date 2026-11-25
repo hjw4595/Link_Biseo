@@ -2,7 +2,6 @@
 import { TopBar } from '@/components/common/top-bar';
 import { MissingResource } from '@/components/common/missing-resource';
 import { EmptyState } from '@/components/common/empty-state';
-import { Button } from '@/components/ui/button';
 import { ContentSkeleton } from '@/components/common/content-skeleton';
 import {
   AppSheet,
@@ -157,16 +156,6 @@ function LinkDetailController(props: LinkDetailOptions) {
                   {error}
                 </p>
               )}
-              <Button
-                type="button"
-                variant="ghost"
-                disabled={query.isFetching || busy}
-                onClick={() => {
-                  void query.refetch();
-                }}
-              >
-                정보 새로고침
-              </Button>
             </form>
           )}
         </AppSheetContent>

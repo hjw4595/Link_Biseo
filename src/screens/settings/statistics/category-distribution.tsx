@@ -38,15 +38,7 @@ export function CategoryDistribution({
       className="min-w-0 rounded-xl border bg-surface p-4 sm:p-6"
       data-testid="category-distribution"
     >
-      <div className="flex items-start justify-between gap-3">
-        <div className="min-w-0 space-y-1">
-          <p className="text-xs tracking-widest text-muted-foreground">
-            LINK OVERVIEW
-          </p>
-          <p className="text-sm text-muted-foreground">
-            내가 저장한 링크의 구성
-          </p>
-        </div>
+      <div className="flex justify-end">
         <Button
           size="sm"
           variant="ghost"
@@ -198,9 +190,6 @@ export function CategoryDistribution({
           ))}
         </ul>
       </div>
-      <p className="mt-4 text-xs text-muted-foreground">
-        카테고리를 선택해 비율을 확인하세요.
-      </p>
     </div>
   );
 }
